@@ -235,5 +235,33 @@ export const api = {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to generate AI remediation');
     return data.remediation;
+  },
+
+  /**
+   * Ask AccessAI conversational consultant
+   */
+  async askAi(question: string, scanContext: any): Promise<any> {
+    const res = await fetch('/api/ai/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, scanContext })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to get AI answer');
+    return data;
+  },
+
+  /**
+   * Explain an accessibility issue in depth
+   */
+  async explainIssue(issue: any): Promise<any> {
+    const res = await fetch('/api/ai/explain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(issue)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to explain issue');
+    return data;
   }
 };

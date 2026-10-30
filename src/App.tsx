@@ -9,6 +9,7 @@ import { AnalyticsPage } from './components/pages/AnalyticsPage';
 import { ReportsPage } from './components/pages/ReportsPage';
 import { SettingsPage } from './components/pages/SettingsPage';
 import { WidgetPage } from './components/pages/WidgetPage';
+import { AiAssistantPanel } from './components/common/AiAssistantPanel';
 import { api } from './services/api';
 import {
   PageId,
@@ -47,6 +48,7 @@ export const App: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>(mockNotifications);
   const [settings, setSettings] = useState<UserSettings>(initialUserSettings);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [isAiAssistantOpen, setIsAiAssistantOpen] = useState<boolean>(false);
 
   // Fetch real data from backend
   const loadDatabaseState = useCallback(async () => {
@@ -449,6 +451,7 @@ export const App: React.FC = () => {
       onClearAllNotifications={() =>
         setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
       }
+      onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
     >
       {/* Demonstration Mode Warning Banner (shown ONLY when demo mode is active) */}
       {isDemoMode && (
@@ -560,6 +563,18 @@ export const App: React.FC = () => {
           onClearAllScans={handleClearAllScans}
         />
       )}
+
+      {/* AI Assistant Sliding Drawer */}
+      <AiAssistantPanel
+        isOpen={isAiAssistantOpen}
+        onClose={() => setIsAiAssistantOpen(false)}
+        activeScan={activeScan}
+        issues={displayIssues}
+        fixes={displayFixes}
+        onUpdateFixStatus={handleUpdateFixStatus}
+        onNavigate={handleNavigate}
+        onAddToast={addToast}
+      />
 
       {/* Floating Toast Notification Layer */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />

@@ -174,6 +174,100 @@ async function runWidgetAndAiTestSuite() {
   assert(widgetContent.includes('not-allowed'), 'Microphone not-allowed permission error handled without looping');
   assert(widgetContent.includes('webkitSpeechRecognition'), 'SpeechRecognition and webkitSpeechRecognition cross-browser fallback');
 
+  // ----------------------------------------------------
+  // TEST 5: First-Level Widget Menu & Voice Submenu Architecture
+  // ----------------------------------------------------
+  console.log('\n--- Test Suite 5: First-Level Voice Menu & Submenu Architecture ---');
+
+  // Verify first-level menu categories exist in widget markup
+  assert(widgetContent.includes('Visual Adjustments'), 'First-level menu contains "Visual Adjustments" category');
+  assert(widgetContent.includes('Navigation Assistance'), 'First-level menu contains "Navigation Assistance" category');
+  assert(widgetContent.includes('Reading Assistance'), 'First-level menu contains "Reading Assistance" category');
+  assert(widgetContent.includes('menu-item-voice'), 'Voice Control is a dedicated first-level menu item (#menu-item-voice)');
+  assert(widgetContent.includes('Screen Reader Support'), 'First-level menu contains "Screen Reader Support" category');
+  assert(widgetContent.includes('menu-reset-all'), 'First-level menu contains "Reset Settings" trigger');
+
+  // Verify dedicated Voice Control Submenu view
+  assert(widgetContent.includes('accessai-voice-view'), 'Dedicated voice submenu container (#accessai-voice-view) defined');
+  assert(widgetContent.includes('accessai-voice-back-btn'), 'Submenu includes Back button (#accessai-voice-back-btn) to return to main menu');
+  assert(widgetContent.includes('accessai-voice-start-btn'), 'Submenu includes Start Listening button (#accessai-voice-start-btn)');
+  assert(widgetContent.includes('accessai-voice-stop-btn'), 'Submenu includes Stop Listening button (#accessai-voice-stop-btn)');
+  assert(widgetContent.includes('accessai-voice-mic-status'), 'Submenu includes Microphone permission status indicator (#accessai-voice-mic-status)');
+  assert(widgetContent.includes('accessai-voice-lang'), 'Submenu includes Language Selector (#accessai-voice-lang)');
+
+  // Verify Supported Languages
+  assert(widgetContent.includes('en-US'), 'Supported language: English (US)');
+  assert(widgetContent.includes('en-GB'), 'Supported language: English (UK)');
+  assert(widgetContent.includes('es-ES'), 'Supported language: Español');
+  assert(widgetContent.includes('fr-FR'), 'Supported language: Français');
+  assert(widgetContent.includes('de-DE'), 'Supported language: Deutsch');
+  assert(widgetContent.includes('hi-IN'), 'Supported language: Hindi');
+
+  // Verify Navigation Spoken Commands
+  assert(widgetContent.includes('scroll down'), 'Voice command "scroll down" supported');
+  assert(widgetContent.includes('scroll up'), 'Voice command "scroll up" supported');
+  assert(widgetContent.includes('go to top'), 'Voice command "go to top" supported');
+  assert(widgetContent.includes('go to bottom'), 'Voice command "go to bottom" supported');
+  assert(widgetContent.includes('open link'), 'Voice command "open link [name]" supported');
+
+  // Verify Visual Controls Spoken Commands
+  assert(widgetContent.includes('increase text size'), 'Voice command "increase text size" supported');
+  assert(widgetContent.includes('decrease text size'), 'Voice command "decrease text size" supported');
+  assert(widgetContent.includes('enable high contrast'), 'Voice command "enable high contrast" supported');
+  assert(widgetContent.includes('disable high contrast'), 'Voice command "disable high contrast" supported');
+  assert(widgetContent.includes('enable dyslexia font'), 'Voice command "enable dyslexia font" supported');
+  assert(widgetContent.includes('disable dyslexia font'), 'Voice command "disable dyslexia font" supported');
+  assert(widgetContent.includes('enable focus indicators'), 'Voice command "enable focus indicators" supported');
+  assert(widgetContent.includes('disable focus indicators'), 'Voice command "disable focus indicators" supported');
+  assert(widgetContent.includes('enable reading ruler'), 'Voice command "enable reading ruler" supported');
+  assert(widgetContent.includes('disable reading ruler'), 'Voice command "disable reading ruler" supported');
+  assert(widgetContent.includes('reset accessibility settings'), 'Voice command "reset accessibility settings" supported');
+
+  // Verify Widget Controls Spoken Commands
+  assert(widgetContent.includes('open accessibility settings'), 'Voice command "open accessibility settings" supported');
+  assert(widgetContent.includes('close accessibility settings'), 'Voice command "close accessibility settings" supported');
+  assert(widgetContent.includes('start listening'), 'Voice command "start listening" supported');
+
+  // ----------------------------------------------------
+  // TEST 6: AI-Assisted Dashboard Panel & Backend Consultant API
+  // ----------------------------------------------------
+  console.log('\n--- Test Suite 6: AI-Assisted Dashboard Panel & Consultant API ---');
+
+  // Verify AiAssistantPanel component file exists
+  const aiPanelPath = path.resolve('src', 'components', 'common', 'AiAssistantPanel.tsx');
+  assert(fs.existsSync(aiPanelPath), 'src/components/common/AiAssistantPanel.tsx exists');
+
+  const panelContent = fs.readFileSync(aiPanelPath, 'utf8');
+  assert(panelContent.includes('AI Overview & Priorities'), 'Panel implements AI Overview tab');
+  assert(panelContent.includes('Explain & Generate Fix'), 'Panel implements Explain & Generate Fix tab');
+  assert(panelContent.includes('Ask AccessAI'), 'Panel implements Ask AccessAI conversational tab');
+  assert(panelContent.includes('Top 5 Prioritized Remediations'), 'Panel implements Top 5 prioritized fixes');
+  assert(panelContent.includes('Copy Code'), 'Panel includes Copy Code button');
+  assert(panelContent.includes('Download Patch'), 'Panel includes Download Patch button');
+  assert(panelContent.includes('Approve Fix'), 'Panel connects to Approve Fix lifecycle');
+
+  // Verify Topbar trigger button
+  const topbarPath = path.resolve('src', 'components', 'layout', 'Topbar.tsx');
+  const topbarContent = fs.readFileSync(topbarPath, 'utf8');
+  assert(topbarContent.includes('onOpenAiAssistant'), 'Topbar accepts onOpenAiAssistant prop');
+  assert(topbarContent.includes('AI Assisted'), 'Topbar renders AI Assisted button');
+  assert(topbarContent.includes('<button'), 'AI Assisted is rendered as an interactive button');
+
+  // Verify App.tsx wiring
+  const appPath = path.resolve('src', 'App.tsx');
+  const appContent = fs.readFileSync(appPath, 'utf8');
+  assert(appContent.includes('AiAssistantPanel'), 'App.tsx imports and renders AiAssistantPanel');
+  assert(appContent.includes('isAiAssistantOpen'), 'App.tsx manages isAiAssistantOpen state');
+  assert(appContent.includes('onOpenAiAssistant'), 'App.tsx wires onOpenAiAssistant callback to Layout');
+
+  // Verify Backend /api/ai/ask & /api/ai/explain endpoints in router
+  const routerPath = path.resolve('server', 'router.ts');
+  const routerContent = fs.readFileSync(routerPath, 'utf8');
+  assert(routerContent.includes('/ai/ask'), 'Router implements POST /ai/ask');
+  assert(routerContent.includes('/ai/explain'), 'Router implements POST /ai/explain');
+  assert(routerContent.includes('deterministic-engine'), 'Router provides deterministic fallback when Gemini key is absent');
+  assert(routerContent.includes('google-gemini'), 'Router supports Gemini 1.5 Flash when configured');
+
   console.log('\n====================================================');
   console.log(`🎉 ALL ${passed}/${total} WIDGET & AI TESTS PASSED!`);
   console.log('====================================================\n');

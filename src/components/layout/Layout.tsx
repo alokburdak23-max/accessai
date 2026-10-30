@@ -11,6 +11,7 @@ interface LayoutProps {
   notifications: NotificationItem[];
   onMarkNotificationRead: (id: string) => void;
   onClearAllNotifications: () => void;
+  onOpenAiAssistant?: () => void;
   children: React.ReactNode;
 }
 
@@ -22,6 +23,7 @@ export const Layout: React.FC<LayoutProps> = ({
   notifications,
   onMarkNotificationRead,
   onClearAllNotifications,
+  onOpenAiAssistant,
   children
 }) => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -48,6 +50,7 @@ export const Layout: React.FC<LayoutProps> = ({
           notifications={notifications}
           onMarkNotificationRead={onMarkNotificationRead}
           onClearAllNotifications={onClearAllNotifications}
+          onOpenAiAssistant={onOpenAiAssistant}
         />
 
         {/* Page Container */}

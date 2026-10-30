@@ -65,6 +65,8 @@
   };
 
   let isOpen = false;
+  let currentWidgetView = 'main'; // 'main' | 'voice'
+  let selectedLanguage = 'en-US';
   let recognitionInstance = null;
   let voiceListening = false;
   let voiceState = 'ready'; // 'ready' | 'requesting_permission' | 'listening' | 'processing' | 'executed' | 'permission_denied' | 'unsupported' | 'error'
@@ -725,6 +727,160 @@
       100% { transform: scale(0.9); opacity: 0.7; }
     }
 
+    /* Menu Group & Submenu View Styles */
+    .accessai-view {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .accessai-menu-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .accessai-menu-group-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #7B8053;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0 4px;
+    }
+
+    .accessai-menu-chevron {
+      display: flex;
+      align-items: center;
+      color: #C96F82;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .accessai-back-btn {
+      background: transparent;
+      border: none;
+      color: #62683F;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .accessai-back-btn:hover {
+      background: #EEF0E3;
+      color: #292A27;
+    }
+
+    .accessai-action-btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .accessai-voice-start-btn {
+      background: #C96F82;
+      color: #FFFFFF;
+      border: 1px solid #C96F82;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .accessai-voice-start-btn:hover {
+      background: #A84F65;
+    }
+
+    .accessai-voice-stop-btn-lg {
+      background: #FFFFFF;
+      color: #C94F55;
+      border: 1px solid #CBD5E1;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .accessai-voice-stop-btn-lg:hover {
+      background: #FFF5F6;
+      border-color: #F8E9ED;
+    }
+
+    .accessai-select {
+      width: 100%;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 10px;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      color: #292A27;
+      outline: none;
+    }
+    .accessai-select:focus {
+      border-color: #C96F82;
+    }
+
+    .accessai-command-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .accessai-command-card {
+      background: #FAFAF8;
+      border: 1px solid #EEF0E3;
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+
+    .accessai-command-card h5 {
+      font-size: 10px;
+      font-weight: 800;
+      color: #7B8053;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .accessai-command-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      color: #292A27;
+      font-size: 10.5px;
+    }
+
+    .accessai-command-list li code {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: 700;
+      color: #C96F82;
+    }
+
     /* Panel Footer */
     .accessai-footer {
       padding: 12px 20px;
@@ -828,130 +984,286 @@
         </button>
       </div>
 
-      <!-- Body Controls -->
+      <!-- Body Controls with 2-level progressive navigation -->
       <div class="accessai-body">
-        <!-- 1. Text Resizing -->
-        <div class="accessai-section">
-          <div class="accessai-section-label">
-            <span>Text Size Scaling</span>
-            <span id="accessai-font-label">${preferences.fontSize}%</span>
+        <!-- VIEW 1: MAIN ACCESSIBILITY CATEGORIES MENU -->
+        <div id="accessai-main-view" class="accessai-view">
+          
+          <!-- Category 1: Visual Adjustments -->
+          <div class="accessai-menu-group">
+            <div class="accessai-menu-group-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
+              <span>Visual Adjustments</span>
+            </div>
+
+            <div class="accessai-section">
+              <div class="accessai-section-label">
+                <span>Text Size Scaling</span>
+                <span id="accessai-font-label">${preferences.fontSize}%</span>
+              </div>
+              <div class="accessai-btn-group" role="group" aria-label="Text size scaling">
+                <button class="accessai-scale-btn ${preferences.fontSize === 100 ? 'active' : ''}" data-size="100">100%</button>
+                <button class="accessai-scale-btn ${preferences.fontSize === 110 ? 'active' : ''}" data-size="110">110%</button>
+                <button class="accessai-scale-btn ${preferences.fontSize === 120 ? 'active' : ''}" data-size="120">120%</button>
+                <button class="accessai-scale-btn ${preferences.fontSize === 130 ? 'active' : ''}" data-size="130">130%</button>
+              </div>
+            </div>
+
+            <div class="accessai-toggle-card ${preferences.highContrast ? 'active' : ''}" id="card-contrast" role="button" tabindex="0" aria-pressed="${preferences.highContrast}">
+              <div class="accessai-toggle-info">
+                <div class="accessai-toggle-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <div class="accessai-toggle-text">
+                  <h4>High Contrast Mode</h4>
+                  <p>Crisp text on dark slate background</p>
+                </div>
+              </div>
+              <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
+            </div>
           </div>
-          <div class="accessai-btn-group" role="group" aria-label="Text size scaling">
-            <button class="accessai-scale-btn ${preferences.fontSize === 100 ? 'active' : ''}" data-size="100">100%</button>
-            <button class="accessai-scale-btn ${preferences.fontSize === 110 ? 'active' : ''}" data-size="110">110%</button>
-            <button class="accessai-scale-btn ${preferences.fontSize === 120 ? 'active' : ''}" data-size="120">120%</button>
-            <button class="accessai-scale-btn ${preferences.fontSize === 130 ? 'active' : ''}" data-size="130">130%</button>
+
+          <!-- Category 2: Navigation Assistance -->
+          <div class="accessai-menu-group">
+            <div class="accessai-menu-group-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="14" y2="8"/></svg>
+              <span>Navigation Assistance</span>
+            </div>
+
+            <div class="accessai-toggle-card ${preferences.focusRing ? 'active' : ''}" id="card-focus" role="button" tabindex="0" aria-pressed="${preferences.focusRing}">
+              <div class="accessai-toggle-info">
+                <div class="accessai-toggle-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <line x1="6" y1="8" x2="6" y2="8"/>
+                    <line x1="10" y1="8" x2="10" y2="8"/>
+                    <line x1="14" y1="8" x2="14" y2="8"/>
+                    <line x1="18" y1="8" x2="18" y2="8"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                </div>
+                <div class="accessai-toggle-text">
+                  <h4>Visible Focus Ring</h4>
+                  <p>Prominent outline on active keyboard elements</p>
+                </div>
+              </div>
+              <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
+            </div>
+          </div>
+
+          <!-- Category 3: Reading Assistance -->
+          <div class="accessai-menu-group">
+            <div class="accessai-menu-group-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+              <span>Reading Assistance</span>
+            </div>
+
+            <div class="accessai-toggle-card ${preferences.dyslexiaFont ? 'active' : ''}" id="card-dyslexia" role="button" tabindex="0" aria-pressed="${preferences.dyslexiaFont}">
+              <div class="accessai-toggle-info">
+                <div class="accessai-toggle-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="4 7 4 4 20 4 20 7"/>
+                    <line x1="9" y1="20" x2="15" y2="20"/>
+                    <line x1="12" y1="4" x2="12" y2="20"/>
+                  </svg>
+                </div>
+                <div class="accessai-toggle-text">
+                  <h4>Dyslexia-Friendly Font</h4>
+                  <p>OpenDyslexic typography with weighted bases</p>
+                </div>
+              </div>
+              <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
+            </div>
+
+            <div class="accessai-toggle-card ${preferences.readingRuler ? 'active' : ''}" id="card-ruler" role="button" tabindex="0" aria-pressed="${preferences.readingRuler}">
+              <div class="accessai-toggle-info">
+                <div class="accessai-toggle-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                  </svg>
+                </div>
+                <div class="accessai-toggle-text">
+                  <h4>Reading Ruler Guide</h4>
+                  <p>Spotlight reading bar following cursor</p>
+                </div>
+              </div>
+              <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
+            </div>
+          </div>
+
+          <!-- Category 4: Voice Control (Dedicated First-Level Item) -->
+          <div class="accessai-menu-group">
+            <div class="accessai-menu-group-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              <span>Voice Control</span>
+            </div>
+
+            <div class="accessai-toggle-card ${preferences.voiceControl ? 'active' : ''}" id="menu-item-voice" role="button" tabindex="0" aria-haspopup="true" aria-label="Open Voice Control submenu">
+              <div class="accessai-toggle-info">
+                <div class="accessai-toggle-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                </div>
+                <div class="accessai-toggle-text">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <h4>Voice Control</h4>
+                    <span id="accessai-voice-badge-menu" class="accessai-status-badge status-ready">Ready</span>
+                  </div>
+                  <p id="accessai-voice-desc-menu">Operate website using spoken commands</p>
+                </div>
+              </div>
+              <div class="accessai-menu-chevron">
+                <span style="font-size:11px;font-weight:700;margin-right:4px;">Open &rarr;</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 5: Screen Reader Support -->
+          <div class="accessai-menu-group">
+            <div class="accessai-menu-group-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Screen Reader Support</span>
+            </div>
+
+            <div class="accessai-toggle-card active" id="card-screen-reader" role="region" aria-label="Screen Reader Support status">
+              <div class="accessai-toggle-info">
+                <div class="accessai-toggle-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </div>
+                <div class="accessai-toggle-text">
+                  <h4>Screen Reader Announcements</h4>
+                  <p>Polite live updates for NVDA, JAWS & VoiceOver</p>
+                </div>
+              </div>
+              <span class="accessai-status-badge status-executed">Active</span>
+            </div>
+          </div>
+
+          <!-- Category 6: Reset Accessibility Settings -->
+          <div class="accessai-menu-group">
+            <div class="accessai-menu-group-header">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              <span>Reset Settings</span>
+            </div>
+
+            <button type="button" id="menu-reset-all" class="accessai-toggle-card" style="width:100%;text-align:left;cursor:pointer;">
+              <div class="accessai-toggle-info">
+                <div class="accessai-toggle-icon" style="background:#FFF5F6;color:#C94F55;border-color:#F8E9ED;">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10"/>
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                  </svg>
+                </div>
+                <div class="accessai-toggle-text">
+                  <h4>Reset Accessibility Settings</h4>
+                  <p>Restore original fonts, contrast & scaling</p>
+                </div>
+              </div>
+              <span style="font-size:11px;font-weight:700;color:#C94F55;">Reset</span>
+            </button>
           </div>
         </div>
 
-        <!-- 2. High Contrast Mode -->
-        <div class="accessai-toggle-card ${preferences.highContrast ? 'active' : ''}" id="card-contrast" role="button" tabindex="0" aria-pressed="${preferences.highContrast}">
-          <div class="accessai-toggle-info">
-            <div class="accessai-toggle-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/>
-              </svg>
+        <!-- VIEW 2: DEDICATED VOICE CONTROL SUBMENU VIEW -->
+        <div id="accessai-voice-view" class="accessai-view" style="display: none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <button type="button" id="accessai-voice-back-btn" class="accessai-back-btn" aria-label="Return to main accessibility menu">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              <span>&larr; Back to Main Menu</span>
+            </button>
+            <span class="accessai-compliance-pill">Voice Control</span>
+          </div>
+
+          <!-- Live Status Bar -->
+          <div id="accessai-voice-box" class="accessai-voice-status">
+            <div class="accessai-voice-header">
+              <div class="accessai-voice-indicator">
+                <div class="accessai-voice-pulse pulse-idle" id="accessai-voice-pulse-dot"></div>
+                <span id="accessai-voice-text" class="accessai-voice-message">Voice Navigation Ready</span>
+              </div>
+              <span id="accessai-voice-badge" class="accessai-status-badge status-ready">Ready</span>
             </div>
-            <div class="accessai-toggle-text">
-              <h4>High Contrast Mode</h4>
-              <p>Crisp text on dark slate background</p>
+            <div class="accessai-voice-hints">
+              <span id="accessai-voice-mic-status">Microphone Permission: Ready on Demand</span>
             </div>
           </div>
-          <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
-        </div>
 
-        <!-- 3. Dyslexia-Friendly Font -->
-        <div class="accessai-toggle-card ${preferences.dyslexiaFont ? 'active' : ''}" id="card-dyslexia" role="button" tabindex="0" aria-pressed="${preferences.dyslexiaFont}">
-          <div class="accessai-toggle-info">
-            <div class="accessai-toggle-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="4 7 4 4 20 4 20 7"/>
-                <line x1="9" y1="20" x2="15" y2="20"/>
-                <line x1="12" y1="4" x2="12" y2="20"/>
-              </svg>
-            </div>
-            <div class="accessai-toggle-text">
-              <h4>Dyslexia-Friendly Font</h4>
-              <p>Weighted letters & wider spacing</p>
-            </div>
-          </div>
-          <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
-        </div>
-
-        <!-- 4. Keyboard Focus Highlight Ring -->
-        <div class="accessai-toggle-card ${preferences.focusRing ? 'active' : ''}" id="card-focus" role="button" tabindex="0" aria-pressed="${preferences.focusRing}">
-          <div class="accessai-toggle-info">
-            <div class="accessai-toggle-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-                <line x1="6" y1="8" x2="6" y2="8"/>
-                <line x1="10" y1="8" x2="10" y2="8"/>
-                <line x1="14" y1="8" x2="14" y2="8"/>
-                <line x1="18" y1="8" x2="18" y2="8"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-            </div>
-            <div class="accessai-toggle-text">
-              <h4>Visible Focus Ring</h4>
-              <p>Prominent outline on active elements</p>
-            </div>
-          </div>
-          <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
-        </div>
-
-        <!-- 5. Reading Ruler Guide -->
-        <div class="accessai-toggle-card ${preferences.readingRuler ? 'active' : ''}" id="card-ruler" role="button" tabindex="0" aria-pressed="${preferences.readingRuler}">
-          <div class="accessai-toggle-info">
-            <div class="accessai-toggle-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="3" y1="12" x2="21" y2="12"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <line x1="3" y1="18" x2="21" y2="18"/>
-              </svg>
-            </div>
-            <div class="accessai-toggle-text">
-              <h4>Reading Ruler</h4>
-              <p>Spotlight bar following cursor</p>
-            </div>
-          </div>
-          <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
-        </div>
-
-        <!-- 6. Voice Navigation (Web Speech API) -->
-        <div class="accessai-toggle-card ${preferences.voiceControl ? 'active' : ''}" id="card-voice" role="button" tabindex="0" aria-pressed="${preferences.voiceControl}">
-          <div class="accessai-toggle-info">
-            <div class="accessai-toggle-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- Main Actions: Start & Stop -->
+          <div class="accessai-action-btn-row">
+            <button type="button" id="accessai-voice-start-btn" class="accessai-voice-start-btn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
                 <line x1="12" y1="19" x2="12" y2="23"/>
                 <line x1="8" y1="23" x2="16" y2="23"/>
               </svg>
-            </div>
-            <div class="accessai-toggle-text">
-              <div style="display:flex;align-items:center;gap:6px;">
-                <h4>Voice Navigation</h4>
-                <span id="accessai-voice-badge" class="accessai-status-badge status-ready">Ready</span>
-              </div>
-              <p id="accessai-voice-desc">Say "Increase text", "High contrast", "Reset"</p>
-            </div>
-          </div>
-          <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
-        </div>
-
-        <div id="accessai-voice-box" style="${preferences.voiceControl ? 'display: flex;' : 'display: none;'}" class="accessai-voice-status">
-          <div class="accessai-voice-header">
-            <div class="accessai-voice-indicator">
-              <div class="accessai-voice-pulse pulse-idle" id="accessai-voice-pulse-dot"></div>
-              <span id="accessai-voice-text" class="accessai-voice-message">Voice Navigation Ready</span>
-            </div>
-            <button type="button" id="accessai-voice-stop-btn" class="accessai-voice-stop-btn" aria-label="Stop voice recognition">
-              Stop Listening
+              <span>Start Listening</span>
+            </button>
+            <button type="button" id="accessai-voice-stop-btn" class="accessai-voice-stop-btn-lg">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="6" y="6" width="12" height="12" rx="2"/>
+              </svg>
+              <span>Stop Listening</span>
             </button>
           </div>
-          <div class="accessai-voice-hints">
-            <span>Commands: "Increase text" • "High contrast" • "Dyslexia" • "Reset" • "Close"</span>
+
+          <!-- Language Selector -->
+          <div>
+            <label for="accessai-voice-lang" style="font-size:10px;font-weight:800;color:#70716B;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;">
+              Spoken Language & Regional Accent:
+            </label>
+            <select id="accessai-voice-lang" class="accessai-select">
+              <option value="en-US">English (United States) - en-US</option>
+              <option value="en-GB">English (United Kingdom) - en-GB</option>
+              <option value="es-ES">Español (España) - es-ES</option>
+              <option value="fr-FR">Français (France) - fr-FR</option>
+              <option value="de-DE">Deutsch (Deutschland) - de-DE</option>
+              <option value="hi-IN">हिन्दी (India) - hi-IN</option>
+            </select>
+          </div>
+
+          <!-- Voice Command Guide -->
+          <div class="accessai-command-grid">
+            <div class="accessai-command-card">
+              <h5>Visual Controls</h5>
+              <ul class="accessai-command-list">
+                <li>• Say <code>"Increase text size"</code> or <code>"Decrease text size"</code></li>
+                <li>• Say <code>"Enable high contrast"</code> or <code>"Disable high contrast"</code></li>
+                <li>• Say <code>"Enable dyslexia font"</code> or <code>"Disable dyslexia font"</code></li>
+                <li>• Say <code>"Enable focus indicators"</code> or <code>"Enable reading ruler"</code></li>
+                <li>• Say <code>"Reset accessibility settings"</code></li>
+              </ul>
+            </div>
+
+            <div class="accessai-command-card">
+              <h5>Page Navigation</h5>
+              <ul class="accessai-command-list">
+                <li>• Say <code>"Scroll down"</code> or <code>"Scroll up"</code></li>
+                <li>• Say <code>"Go to top"</code> or <code>"Go to bottom"</code></li>
+                <li>• Say <code>"Open [link name]"</code> (e.g. "Open destinations")</li>
+                <li>• Say <code>"Stop listening"</code></li>
+              </ul>
+            </div>
+
+            <div class="accessai-command-card">
+              <h5>Widget Controls</h5>
+              <ul class="accessai-command-list">
+                <li>• Say <code>"Open accessibility settings"</code></li>
+                <li>• Say <code>"Close accessibility settings"</code></li>
+                <li>• Say <code>"Start listening"</code> or <code>"Stop listening"</code></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -1032,6 +1344,28 @@
     }
   }
 
+  // Switch between Main Menu View and Voice Control Submenu View
+  function switchWidgetView(view) {
+    currentWidgetView = view;
+    const mainView = shadow.getElementById('accessai-main-view');
+    const voiceView = shadow.getElementById('accessai-voice-view');
+    if (view === 'voice') {
+      if (mainView) mainView.style.display = 'none';
+      if (voiceView) {
+        voiceView.style.display = 'flex';
+        shadow.getElementById('accessai-voice-back-btn')?.focus();
+      }
+      announce('Voice control submenu opened.');
+    } else {
+      if (voiceView) voiceView.style.display = 'none';
+      if (mainView) {
+        mainView.style.display = 'flex';
+        shadow.getElementById('menu-item-voice')?.focus();
+      }
+      announce('Returned to main accessibility menu.');
+    }
+  }
+
   // Voice State Definitions & UI Updater
   const VOICE_STATES = {
     ready: {
@@ -1088,14 +1422,21 @@
     voiceState = stateKey;
     const def = VOICE_STATES[stateKey] || VOICE_STATES.ready;
     const badge = shadow.getElementById('accessai-voice-badge');
-    const desc = shadow.getElementById('accessai-voice-desc');
+    const menuBadge = shadow.getElementById('accessai-voice-badge-menu');
+    const menuDesc = shadow.getElementById('accessai-voice-desc-menu');
     const text = shadow.getElementById('accessai-voice-text');
     const dot = shadow.getElementById('accessai-voice-pulse-dot');
-    const box = shadow.getElementById('accessai-voice-box');
+    const micStatus = shadow.getElementById('accessai-voice-mic-status');
+    const startBtn = shadow.getElementById('accessai-voice-start-btn');
+    const stopBtn = shadow.getElementById('accessai-voice-stop-btn');
 
     if (badge) {
       badge.textContent = def.badgeText;
       badge.className = 'accessai-status-badge ' + def.badgeClass;
+    }
+    if (menuBadge) {
+      menuBadge.textContent = def.badgeText;
+      menuBadge.className = 'accessai-status-badge ' + def.badgeClass;
     }
 
     const message = customMsg || def.defaultMsg;
@@ -1108,31 +1449,48 @@
       dot.className = 'accessai-voice-pulse ' + def.pulseClass;
     }
 
-    if (desc) {
+    if (menuDesc) {
       if (stateKey === 'listening') {
-        desc.textContent = 'Listening: Say "Increase text", "High contrast", "Reset"';
-      } else if (stateKey === 'requesting_permission') {
-        desc.textContent = 'Please allow microphone access in your browser prompt';
+        menuDesc.textContent = 'Listening actively for voice commands';
       } else if (stateKey === 'permission_denied') {
-        desc.textContent = 'Microphone access blocked. Click to retry after enabling mic.';
+        menuDesc.textContent = 'Microphone permission denied';
       } else if (stateKey === 'unsupported') {
-        desc.textContent = 'Web Speech API unavailable in this browser (Chrome recommended).';
-      } else if (stateKey === 'executed' && customMsg) {
-        desc.textContent = customMsg;
-      } else if (stateKey === 'processing' && customMsg) {
-        desc.textContent = customMsg;
-      } else if (stateKey === 'error' && customMsg) {
-        desc.textContent = customMsg;
+        menuDesc.textContent = 'Web Speech API unavailable';
       } else {
-        desc.textContent = 'Say "Increase text", "High contrast", "Reset"';
+        menuDesc.textContent = 'Operate website using spoken commands';
       }
     }
 
-    if (box) {
-      if (preferences.voiceControl || stateKey === 'permission_denied' || stateKey === 'error') {
-        box.style.display = 'flex';
+    if (micStatus) {
+      if (stateKey === 'listening') {
+        micStatus.textContent = 'Microphone Permission: Granted & Active';
+        micStatus.style.color = '#648568';
+      } else if (stateKey === 'permission_denied') {
+        micStatus.textContent = 'Microphone Permission: Blocked / Denied by Browser';
+        micStatus.style.color = '#C94F55';
+      } else if (stateKey === 'requesting_permission') {
+        micStatus.textContent = 'Microphone Permission: Prompt Requested (Click Allow)';
+        micStatus.style.color = '#D88A4C';
+      } else if (stateKey === 'unsupported') {
+        micStatus.textContent = 'Microphone Permission: Web Speech API Unsupported';
+        micStatus.style.color = '#64748B';
       } else {
-        box.style.display = 'none';
+        micStatus.textContent = 'Microphone Permission: Ready on Demand';
+        micStatus.style.color = '#70716B';
+      }
+    }
+
+    if (startBtn && stopBtn) {
+      if (stateKey === 'listening' || stateKey === 'requesting_permission' || stateKey === 'processing') {
+        startBtn.style.opacity = '0.5';
+        startBtn.style.pointerEvents = 'none';
+        stopBtn.style.opacity = '1';
+        stopBtn.style.pointerEvents = 'auto';
+      } else {
+        startBtn.style.opacity = '1';
+        startBtn.style.pointerEvents = 'auto';
+        stopBtn.style.opacity = '0.5';
+        stopBtn.style.pointerEvents = 'none';
       }
     }
   }
@@ -1166,12 +1524,13 @@
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = false;
-      recognition.lang = 'en-US';
+      recognition.lang = selectedLanguage;
       recognition.maxAlternatives = 1;
 
       recognition.onstart = function() {
         voiceListening = true;
         isExplicitlyStopped = false;
+        preferences.voiceControl = true;
         setVoiceState('listening', 'Listening for voice commands...');
       };
 
@@ -1255,7 +1614,70 @@
 
     let recognized = true;
 
-    if (cmd.includes('increase text') || cmd.includes('larger text') || cmd.includes('bigger text') || cmd.includes('increase font') || cmd.includes('zoom in') || cmd.includes('make text bigger')) {
+    // 1. Navigation Commands
+    if (cmd.includes('scroll down') || cmd.includes('move down') || cmd.includes('page down')) {
+      window.scrollBy({ top: 450, behavior: 'smooth' });
+      setVoiceState('executed', 'Executed: Scrolled down page');
+      announce('Scrolled down page.');
+    } else if (cmd.includes('scroll up') || cmd.includes('move up') || cmd.includes('page up')) {
+      window.scrollBy({ top: -450, behavior: 'smooth' });
+      setVoiceState('executed', 'Executed: Scrolled up page');
+      announce('Scrolled up page.');
+    } else if (cmd.includes('go to top') || cmd.includes('scroll to top') || cmd.includes('top of page')) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setVoiceState('executed', 'Executed: Scrolled to top of page');
+      announce('Scrolled to top of page.');
+    } else if (cmd.includes('go to bottom') || cmd.includes('scroll to bottom') || cmd.includes('bottom of page')) {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      setVoiceState('executed', 'Executed: Scrolled to bottom of page');
+      announce('Scrolled to bottom of page.');
+    } else if (cmd.startsWith('open link ') || (cmd.startsWith('open ') && !cmd.includes('settings') && !cmd.includes('panel') && !cmd.includes('menu') && !cmd.includes('accessibility'))) {
+      const targetQuery = cmd.replace(/^open link /, '').replace(/^open /, '').trim();
+      if (targetQuery.length > 1) {
+        const links = Array.from(document.querySelectorAll('a[href]'));
+        const matched = links.find(l => {
+          const txt = (l.textContent || '').trim().toLowerCase();
+          const aria = (l.getAttribute('aria-label') || '').trim().toLowerCase();
+          const title = (l.getAttribute('title') || '').trim().toLowerCase();
+          return txt.includes(targetQuery) || aria.includes(targetQuery) || title.includes(targetQuery);
+        });
+
+        if (matched) {
+          setVoiceState('executed', `Executed: Opening link "${targetQuery}"`);
+          announce(`Opening link ${targetQuery}.`);
+          setTimeout(() => {
+            matched.click();
+          }, 700);
+          return;
+        } else {
+          setVoiceState('listening', `Link matching "${targetQuery}" not found`);
+          announce(`Link ${targetQuery} not found on this page.`);
+        }
+      }
+    } 
+    // 2. Widget Controls
+    else if (cmd.includes('open accessibility settings') || cmd.includes('open settings') || cmd.includes('open accessibility') || cmd.includes('open menu') || cmd.includes('show panel')) {
+      togglePanel(true);
+      setVoiceState('executed', 'Executed: Accessibility settings opened');
+    } else if (cmd.includes('close accessibility settings') || cmd.includes('close settings') || cmd.includes('close accessibility') || cmd.includes('close menu') || cmd.includes('hide settings')) {
+      togglePanel(false);
+      setVoiceState('executed', 'Executed: Accessibility settings closed');
+    } else if (cmd.includes('stop listening') || cmd.includes('stop voice') || cmd.includes('turn off voice')) {
+      stopVoiceControl(true);
+      preferences.voiceControl = false;
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      setVoiceState('ready', 'Voice navigation stopped');
+      announce('Voice navigation stopped.');
+      return;
+    } else if (cmd.includes('start listening')) {
+      startVoiceControl();
+      setVoiceState('listening', 'Voice navigation active and listening');
+      announce('Voice navigation listening.');
+      return;
+    } 
+    // 3. Visual Controls
+    else if (cmd.includes('increase text size') || cmd.includes('increase text') || cmd.includes('larger text') || cmd.includes('bigger text') || cmd.includes('make text bigger') || cmd.includes('zoom in')) {
       const sizes = [100, 110, 120, 130];
       const idx = sizes.indexOf(preferences.fontSize);
       preferences.fontSize = sizes[Math.min(sizes.length - 1, idx + 1)];
@@ -1263,7 +1685,7 @@
       updateUI();
       setVoiceState('executed', `Executed: Text size increased to ${preferences.fontSize}%`);
       announce(`Text size increased to ${preferences.fontSize} percent.`);
-    } else if (cmd.includes('decrease text') || cmd.includes('smaller text') || cmd.includes('smaller font') || cmd.includes('decrease font') || cmd.includes('zoom out') || cmd.includes('make text smaller')) {
+    } else if (cmd.includes('decrease text size') || cmd.includes('decrease text') || cmd.includes('smaller text') || cmd.includes('make text smaller') || cmd.includes('zoom out')) {
       const sizes = [100, 110, 120, 130];
       const idx = sizes.indexOf(preferences.fontSize);
       preferences.fontSize = sizes[Math.max(0, idx - 1)];
@@ -1271,31 +1693,55 @@
       updateUI();
       setVoiceState('executed', `Executed: Text size decreased to ${preferences.fontSize}%`);
       announce(`Text size decreased to ${preferences.fontSize} percent.`);
-    } else if (cmd.includes('high contrast') || cmd.includes('contrast') || cmd.includes('dark mode') || cmd.includes('invert colors')) {
-      preferences.highContrast = !preferences.highContrast;
+    } else if (cmd.includes('disable high contrast') || cmd.includes('turn off high contrast') || cmd.includes('contrast off') || cmd.includes('dark mode off')) {
+      preferences.highContrast = false;
       applyHostPreferences({ skipVoice: true });
       updateUI();
-      setVoiceState('executed', `Executed: High contrast ${preferences.highContrast ? 'enabled' : 'disabled'}`);
-      announce(`High contrast ${preferences.highContrast ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('dyslexia') || cmd.includes('dyslexic') || cmd.includes('font')) {
-      preferences.dyslexiaFont = !preferences.dyslexiaFont;
+      setVoiceState('executed', 'Executed: High contrast disabled');
+      announce('High contrast mode disabled.');
+    } else if (cmd.includes('enable high contrast') || cmd.includes('turn on high contrast') || cmd.includes('high contrast on') || cmd.includes('dark mode on') || cmd.includes('contrast')) {
+      preferences.highContrast = true;
       applyHostPreferences({ skipVoice: true });
       updateUI();
-      setVoiceState('executed', `Executed: Dyslexia font ${preferences.dyslexiaFont ? 'enabled' : 'disabled'}`);
-      announce(`Dyslexia-friendly font ${preferences.dyslexiaFont ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('focus') || cmd.includes('keyboard ring') || cmd.includes('highlight')) {
-      preferences.focusRing = !preferences.focusRing;
+      setVoiceState('executed', 'Executed: High contrast enabled');
+      announce('High contrast mode enabled.');
+    } else if (cmd.includes('disable dyslexia font') || cmd.includes('disable dyslexia-friendly font') || cmd.includes('disable dyslexia mode') || cmd.includes('turn off dyslexia font')) {
+      preferences.dyslexiaFont = false;
       applyHostPreferences({ skipVoice: true });
       updateUI();
-      setVoiceState('executed', `Executed: Focus ring ${preferences.focusRing ? 'enabled' : 'disabled'}`);
-      announce(`Focus ring highlight ${preferences.focusRing ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('ruler') || cmd.includes('guide') || cmd.includes('reading line')) {
-      preferences.readingRuler = !preferences.readingRuler;
+      setVoiceState('executed', 'Executed: Dyslexia font disabled');
+      announce('Dyslexia font disabled.');
+    } else if (cmd.includes('enable dyslexia font') || cmd.includes('enable dyslexia-friendly font') || cmd.includes('enable dyslexia mode') || cmd.includes('turn on dyslexia font') || cmd.includes('dyslexia')) {
+      preferences.dyslexiaFont = true;
       applyHostPreferences({ skipVoice: true });
       updateUI();
-      setVoiceState('executed', `Executed: Reading ruler ${preferences.readingRuler ? 'enabled' : 'disabled'}`);
-      announce(`Reading ruler ${preferences.readingRuler ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('reset') || cmd.includes('default') || cmd.includes('normal')) {
+      setVoiceState('executed', 'Executed: Dyslexia font enabled');
+      announce('Dyslexia font enabled.');
+    } else if (cmd.includes('disable focus indicators') || cmd.includes('disable focus ring') || cmd.includes('turn off focus')) {
+      preferences.focusRing = false;
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      setVoiceState('executed', 'Executed: Focus indicators disabled');
+      announce('Focus ring disabled.');
+    } else if (cmd.includes('enable focus indicators') || cmd.includes('enable focus ring') || cmd.includes('turn on focus') || cmd.includes('focus ring') || cmd.includes('focus')) {
+      preferences.focusRing = true;
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      setVoiceState('executed', 'Executed: Focus indicators enabled');
+      announce('Focus ring enabled.');
+    } else if (cmd.includes('disable reading ruler') || cmd.includes('turn off reading ruler') || cmd.includes('ruler off')) {
+      preferences.readingRuler = false;
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      setVoiceState('executed', 'Executed: Reading ruler disabled');
+      announce('Reading ruler disabled.');
+    } else if (cmd.includes('enable reading ruler') || cmd.includes('turn on reading ruler') || cmd.includes('reading ruler on') || cmd.includes('reading ruler') || cmd.includes('ruler')) {
+      preferences.readingRuler = true;
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      setVoiceState('executed', 'Executed: Reading ruler enabled');
+      announce('Reading ruler enabled.');
+    } else if (cmd.includes('reset accessibility settings') || cmd.includes('reset settings') || cmd.includes('reset all') || cmd.includes('normal')) {
       preferences.fontSize = 100;
       preferences.dyslexiaFont = false;
       preferences.highContrast = false;
@@ -1306,23 +1752,9 @@
       updateUI();
       setVoiceState('executed', 'Executed: Reset settings to default');
       announce('All accessibility settings restored to default.');
-    } else if (cmd.includes('open') || cmd.includes('accessibility') || cmd.includes('menu') || cmd.includes('show panel')) {
-      togglePanel(true);
-      setVoiceState('executed', 'Executed: Accessibility panel opened');
-    } else if (cmd.includes('close') || cmd.includes('hide')) {
-      togglePanel(false);
-      setVoiceState('executed', 'Executed: Accessibility panel closed');
-    } else if (cmd.includes('stop listening') || cmd.includes('stop voice') || cmd.includes('turn off voice')) {
-      stopVoiceControl(true);
-      preferences.voiceControl = false;
-      applyHostPreferences({ skipVoice: true });
-      updateUI();
-      setVoiceState('ready', 'Voice navigation stopped');
-      announce('Voice navigation stopped.');
-      return;
     } else {
       recognized = false;
-      setVoiceState('listening', `Heard: "${cmd}" (say "Increase text", "High contrast", "Reset")`);
+      setVoiceState('listening', `Heard: "${cmd}" (check Voice Command Guide)`);
     }
 
     if (recognized) {
@@ -1370,15 +1802,10 @@
       cardRuler.setAttribute('aria-pressed', String(preferences.readingRuler));
     }
 
-    const cardVoice = shadow.getElementById('card-voice');
-    if (cardVoice) {
-      cardVoice.classList.toggle('active', preferences.voiceControl);
-      cardVoice.setAttribute('aria-pressed', String(preferences.voiceControl));
-    }
-
-    const voiceBox = shadow.getElementById('accessai-voice-box');
-    if (voiceBox) {
-      voiceBox.style.display = (preferences.voiceControl || voiceState === 'permission_denied' || voiceState === 'error') ? 'flex' : 'none';
+    const menuItemVoice = shadow.getElementById('menu-item-voice');
+    if (menuItemVoice) {
+      menuItemVoice.classList.toggle('active', preferences.voiceControl);
+      menuItemVoice.setAttribute('aria-pressed', String(preferences.voiceControl));
     }
 
     updateBadge();
@@ -1424,51 +1851,44 @@
   setupToggleCard('card-focus', 'focusRing', 'Visible focus ring');
   setupToggleCard('card-ruler', 'readingRuler', 'Reading ruler');
 
-  // Voice Navigation Toggle Card with Stop Propagation
-  const cardVoice = shadow.getElementById('card-voice');
-  if (cardVoice) {
-    const toggleVoice = () => {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        preferences.voiceControl = false;
-        setVoiceState('unsupported');
-        announce('Speech recognition is not supported in this browser.');
-        return;
-      }
-
-      preferences.voiceControl = !preferences.voiceControl;
-      if (preferences.voiceControl) {
-        startVoiceControl();
-        announce('Voice navigation activated. Listening for commands.');
-      } else {
-        stopVoiceControl(true);
-        setVoiceState('ready');
-        announce('Voice navigation stopped.');
-      }
-      applyHostPreferences({ skipVoice: true });
-      updateUI();
-    };
-
-    cardVoice.addEventListener('click', (e) => {
-      const target = e.target;
-      if (target && (target.id === 'accessai-voice-stop-btn' || target.closest('#accessai-voice-stop-btn'))) {
-        return;
-      }
-      toggleVoice();
+  // First-Level Voice Control Menu Item Click
+  const voiceMenuItem = shadow.getElementById('menu-item-voice');
+  if (voiceMenuItem) {
+    voiceMenuItem.addEventListener('click', () => {
+      switchWidgetView('voice');
     });
-
-    cardVoice.addEventListener('keydown', (e) => {
+    voiceMenuItem.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        toggleVoice();
+        switchWidgetView('voice');
       }
     });
   }
 
-  // Stop Listening Button
-  const stopBtn = shadow.getElementById('accessai-voice-stop-btn');
-  if (stopBtn) {
-    stopBtn.addEventListener('click', (e) => {
+  // Voice Submenu Back Button
+  const voiceBackBtn = shadow.getElementById('accessai-voice-back-btn');
+  if (voiceBackBtn) {
+    voiceBackBtn.addEventListener('click', () => {
+      switchWidgetView('main');
+    });
+  }
+
+  // Voice Submenu Start Listening Button
+  const voiceStartBtn = shadow.getElementById('accessai-voice-start-btn');
+  if (voiceStartBtn) {
+    voiceStartBtn.addEventListener('click', () => {
+      preferences.voiceControl = true;
+      startVoiceControl();
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      announce('Voice navigation activated. Listening for commands.');
+    });
+  }
+
+  // Voice Submenu Stop Listening Button
+  const voiceStopBtn = shadow.getElementById('accessai-voice-stop-btn');
+  if (voiceStopBtn) {
+    voiceStopBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
       preferences.voiceControl = false;
@@ -1480,21 +1900,44 @@
     });
   }
 
-  // Reset All
-  shadow.getElementById('accessai-reset').addEventListener('click', () => {
+  // Language Selector
+  const voiceLangSelect = shadow.getElementById('accessai-voice-lang');
+  if (voiceLangSelect) {
+    voiceLangSelect.addEventListener('change', (e) => {
+      selectedLanguage = e.target.value;
+      announce(`Voice language set to ${selectedLanguage}.`);
+      if (preferences.voiceControl) {
+        stopVoiceControl(false);
+        startVoiceControl();
+      }
+    });
+  }
+
+  // Menu Reset All & Footer Reset
+  const resetHandler = () => {
     preferences = Object.assign({}, defaultPrefs);
     stopVoiceControl(true);
     setVoiceState('ready');
     applyHostPreferences({ skipVoice: true });
     updateUI();
     announce('All accessibility settings restored to default.');
-  });
+  };
+
+  const footerReset = shadow.getElementById('accessai-reset');
+  if (footerReset) footerReset.addEventListener('click', resetHandler);
+
+  const menuReset = shadow.getElementById('menu-reset-all');
+  if (menuReset) menuReset.addEventListener('click', resetHandler);
 
   // Global Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
-    // Escape to close
+    // Escape key handling
     if (e.key === 'Escape' && isOpen) {
-      togglePanel(false);
+      if (currentWidgetView === 'voice') {
+        switchWidgetView('main');
+      } else {
+        togglePanel(false);
+      }
     }
     // Alt + A (or Ctrl + Alt + A) to toggle panel
     if ((e.altKey && (e.key === 'a' || e.key === 'A')) || (e.ctrlKey && e.altKey && (e.key === 'a' || e.key === 'A'))) {

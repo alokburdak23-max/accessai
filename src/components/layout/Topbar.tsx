@@ -19,6 +19,7 @@ interface TopbarProps {
   notifications: NotificationItem[];
   onMarkNotificationRead: (id: string) => void;
   onClearAllNotifications: () => void;
+  onOpenAiAssistant?: () => void;
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -27,7 +28,8 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenMobileMenu,
   notifications,
   onMarkNotificationRead,
-  onClearAllNotifications
+  onClearAllNotifications,
+  onOpenAiAssistant
 }) => {
   const [showNotifMenu, setShowNotifMenu] = useState(false);
 
@@ -120,11 +122,17 @@ export const Topbar: React.FC<TopbarProps> = ({
           </button>
         )}
 
-        {/* AI Assisted Indicator */}
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F6F7F0] border border-[#EEF0E3] text-[#62683F] text-xs font-semibold">
-          <Sparkles className="w-3.5 h-3.5 text-[#7B8053]" />
+        {/* AI Assisted Button (Functional Trigger for AI Assistance Panel) */}
+        <button
+          onClick={onOpenAiAssistant}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F6F7F0] hover:bg-[#EEF0E3] border border-[#EEF0E3] hover:border-[#7B8053]/40 text-[#62683F] hover:text-[#292A27] text-xs font-semibold transition-all transform active:scale-95 shadow-sm group focus:outline-none focus:ring-2 focus:ring-[#C96F82]"
+          aria-label="Open AI-Assisted accessibility consultant"
+          title="Open AI-Assisted Accessibility Consultant"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#C96F82] group-hover:rotate-12 transition-transform" />
           <span>AI Assisted</span>
-        </div>
+          <span className="w-2 h-2 rounded-full bg-[#7B8053] animate-pulse"></span>
+        </button>
 
         {/* Notifications Icon & Popover */}
         <div className="relative">

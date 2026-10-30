@@ -67,6 +67,9 @@
   let isOpen = false;
   let recognitionInstance = null;
   let voiceListening = false;
+  let voiceState = 'ready'; // 'ready' | 'requesting_permission' | 'listening' | 'processing' | 'executed' | 'permission_denied' | 'unsupported' | 'error'
+  let isExplicitlyStopped = false;
+  let voiceFeedbackTimer = null;
   let voiceLastSpoken = '';
 
   // Host CSS Styles Injection (applies styling to the host page when features are enabled)
@@ -165,7 +168,7 @@
   });
 
   // Apply Preferences to Host Document
-  function applyHostPreferences() {
+  function applyHostPreferences(options) {
     const root = document.documentElement;
 
     // Font resizing
@@ -191,11 +194,13 @@
       rulerEl.style.display = preferences.readingRuler ? 'block' : 'none';
     }
 
-    // Voice recognition
-    if (preferences.voiceControl) {
-      startVoiceControl();
-    } else {
-      stopVoiceControl();
+    // Voice recognition (reconcile unless explicitly told to skip voice lifecycle)
+    if (!options || !options.skipVoice) {
+      if (preferences.voiceControl) {
+        startVoiceControl();
+      } else {
+        stopVoiceControl(true);
+      }
     }
 
     try {
@@ -565,25 +570,153 @@
       transform: translateX(18px);
     }
 
+    /* Voice Status Badges */
+    .accessai-status-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1.2;
+    }
+    .status-ready {
+      background: #F6F7F0;
+      color: #7B8053;
+      border: 1px solid #EEF0E3;
+    }
+    .status-requesting {
+      background: #FFF8F2;
+      color: #D88A4C;
+      border: 1px solid #FDEEE2;
+      animation: status-blink 0.9s infinite alternate;
+    }
+    .status-listening {
+      background: #FFF5F6;
+      color: #C96F82;
+      border: 1px solid #F8E9ED;
+    }
+    .status-processing {
+      background: #EEF2FF;
+      color: #4F46E5;
+      border: 1px solid #E0E7FF;
+    }
+    .status-executed {
+      background: #F2F7F3;
+      color: #648568;
+      border: 1px solid #E2EDE4;
+    }
+    .status-denied {
+      background: #FFF5F6;
+      color: #C94F55;
+      border: 1px solid #F8E9ED;
+    }
+    .status-unsupported {
+      background: #F1F5F9;
+      color: #64748B;
+      border: 1px solid #CBD5E1;
+    }
+    .status-error {
+      background: #FFF8F2;
+      color: #D88A4C;
+      border: 1px solid #FDEEE2;
+    }
+
+    @keyframes status-blink {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
     /* Voice Recognition Bar */
     .accessai-voice-status {
       display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      font-size: 11px;
+      color: #334155;
+      transition: all 0.2s ease;
+    }
+
+    .accessai-voice-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .accessai-voice-indicator {
+      display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
-      border-radius: 10px;
-      background: #F6F7F0;
-      border: 1px solid #EEF0E3;
-      font-size: 11px;
-      color: #62683F;
+      flex: 1;
+      min-width: 0;
     }
 
     .accessai-voice-pulse {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: #7B8053;
-      animation: voice-pulse 1.4s infinite;
+      flex-shrink: 0;
+    }
+
+    .pulse-idle {
+      background: #94A3B8;
+    }
+    .pulse-listening {
+      background: #C96F82;
+      animation: voice-pulse 1.3s infinite;
+    }
+    .pulse-processing {
+      background: #4F46E5;
+      animation: voice-pulse 0.7s infinite;
+    }
+    .pulse-executed {
+      background: #648568;
+    }
+    .pulse-error {
+      background: #C94F55;
+    }
+
+    .accessai-voice-message {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #1E293B;
+    }
+
+    .accessai-voice-stop-btn {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      color: #C94F55;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .accessai-voice-stop-btn:hover {
+      background: #FFF5F6;
+      border-color: #F8E9ED;
+      color: #A84F65;
+    }
+
+    .accessai-voice-hints {
+      font-size: 10px;
+      color: #64748B;
+      border-top: 1px dashed #E2E8F0;
+      padding-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     @keyframes voice-pulse {
@@ -797,16 +930,29 @@
               </svg>
             </div>
             <div class="accessai-toggle-text">
-              <h4>Voice Commands</h4>
-              <p>Say "larger text", "contrast", "close"</p>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <h4>Voice Navigation</h4>
+                <span id="accessai-voice-badge" class="accessai-status-badge status-ready">Ready</span>
+              </div>
+              <p id="accessai-voice-desc">Say "Increase text", "High contrast", "Reset"</p>
             </div>
           </div>
           <div class="accessai-switch"><div class="accessai-switch-thumb"></div></div>
         </div>
 
         <div id="accessai-voice-box" style="${preferences.voiceControl ? 'display: flex;' : 'display: none;'}" class="accessai-voice-status">
-          <div class="accessai-voice-pulse"></div>
-          <span id="accessai-voice-text">Listening for commands...</span>
+          <div class="accessai-voice-header">
+            <div class="accessai-voice-indicator">
+              <div class="accessai-voice-pulse pulse-idle" id="accessai-voice-pulse-dot"></div>
+              <span id="accessai-voice-text" class="accessai-voice-message">Voice Navigation Ready</span>
+            </div>
+            <button type="button" id="accessai-voice-stop-btn" class="accessai-voice-stop-btn" aria-label="Stop voice recognition">
+              Stop Listening
+            </button>
+          </div>
+          <div class="accessai-voice-hints">
+            <span>Commands: "Increase text" • "High contrast" • "Dyslexia" • "Reset" • "Close"</span>
+          </div>
         </div>
       </div>
 
@@ -886,45 +1032,197 @@
     }
   }
 
+  // Voice State Definitions & UI Updater
+  const VOICE_STATES = {
+    ready: {
+      badgeText: 'Ready',
+      badgeClass: 'status-ready',
+      pulseClass: 'pulse-idle',
+      defaultMsg: 'Voice Navigation Ready'
+    },
+    requesting_permission: {
+      badgeText: 'Requesting permission',
+      badgeClass: 'status-requesting',
+      pulseClass: 'pulse-listening',
+      defaultMsg: 'Requesting microphone permission...'
+    },
+    listening: {
+      badgeText: 'Listening',
+      badgeClass: 'status-listening',
+      pulseClass: 'pulse-listening',
+      defaultMsg: 'Listening for voice commands...'
+    },
+    processing: {
+      badgeText: 'Processing command',
+      badgeClass: 'status-processing',
+      pulseClass: 'pulse-processing',
+      defaultMsg: 'Processing speech command...'
+    },
+    executed: {
+      badgeText: 'Command executed',
+      badgeClass: 'status-executed',
+      pulseClass: 'pulse-executed',
+      defaultMsg: 'Command executed successfully'
+    },
+    permission_denied: {
+      badgeText: 'Permission denied',
+      badgeClass: 'status-denied',
+      pulseClass: 'pulse-error',
+      defaultMsg: 'Microphone permission was denied by browser'
+    },
+    unsupported: {
+      badgeText: 'Browser unsupported',
+      badgeClass: 'status-unsupported',
+      pulseClass: 'pulse-idle',
+      defaultMsg: 'Speech recognition is not supported in this browser'
+    },
+    error: {
+      badgeText: 'Recognition error',
+      badgeClass: 'status-error',
+      pulseClass: 'pulse-error',
+      defaultMsg: 'Speech recognition error occurred'
+    }
+  };
+
+  function setVoiceState(stateKey, customMsg) {
+    voiceState = stateKey;
+    const def = VOICE_STATES[stateKey] || VOICE_STATES.ready;
+    const badge = shadow.getElementById('accessai-voice-badge');
+    const desc = shadow.getElementById('accessai-voice-desc');
+    const text = shadow.getElementById('accessai-voice-text');
+    const dot = shadow.getElementById('accessai-voice-pulse-dot');
+    const box = shadow.getElementById('accessai-voice-box');
+
+    if (badge) {
+      badge.textContent = def.badgeText;
+      badge.className = 'accessai-status-badge ' + def.badgeClass;
+    }
+
+    const message = customMsg || def.defaultMsg;
+
+    if (text) {
+      text.textContent = message;
+    }
+
+    if (dot) {
+      dot.className = 'accessai-voice-pulse ' + def.pulseClass;
+    }
+
+    if (desc) {
+      if (stateKey === 'listening') {
+        desc.textContent = 'Listening: Say "Increase text", "High contrast", "Reset"';
+      } else if (stateKey === 'requesting_permission') {
+        desc.textContent = 'Please allow microphone access in your browser prompt';
+      } else if (stateKey === 'permission_denied') {
+        desc.textContent = 'Microphone access blocked. Click to retry after enabling mic.';
+      } else if (stateKey === 'unsupported') {
+        desc.textContent = 'Web Speech API unavailable in this browser (Chrome recommended).';
+      } else if (stateKey === 'executed' && customMsg) {
+        desc.textContent = customMsg;
+      } else if (stateKey === 'processing' && customMsg) {
+        desc.textContent = customMsg;
+      } else if (stateKey === 'error' && customMsg) {
+        desc.textContent = customMsg;
+      } else {
+        desc.textContent = 'Say "Increase text", "High contrast", "Reset"';
+      }
+    }
+
+    if (box) {
+      if (preferences.voiceControl || stateKey === 'permission_denied' || stateKey === 'error') {
+        box.style.display = 'flex';
+      } else {
+        box.style.display = 'none';
+      }
+    }
+  }
+
   // Web Speech API Voice Recognition
   function startVoiceControl() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       console.warn('Web Speech API is not supported in this browser.');
+      preferences.voiceControl = false;
+      setVoiceState('unsupported');
+      updateUI();
+      return;
+    }
+
+    isExplicitlyStopped = false;
+
+    // If instance is already active and listening, avoid recreating
+    if (recognitionInstance && (voiceState === 'listening' || voiceState === 'requesting_permission')) {
       return;
     }
 
     if (recognitionInstance) {
-      try { recognitionInstance.stop(); } catch(e) {}
+      try { recognitionInstance.abort(); } catch(e) {}
+      recognitionInstance = null;
     }
+
+    setVoiceState('requesting_permission', 'Requesting microphone permission...');
 
     try {
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
+      recognition.maxAlternatives = 1;
 
       recognition.onstart = function() {
         voiceListening = true;
-        const vText = shadow.getElementById('accessai-voice-text');
-        if (vText) vText.textContent = 'Listening for voice commands...';
+        isExplicitlyStopped = false;
+        setVoiceState('listening', 'Listening for voice commands...');
       };
 
       recognition.onresult = function(event) {
+        if (!event.results || event.results.length === 0) return;
         const lastResultIndex = event.results.length - 1;
         const transcript = event.results[lastResultIndex][0].transcript.trim().toLowerCase();
         handleVoiceCommand(transcript);
       };
 
       recognition.onerror = function(event) {
-        if (event.error !== 'no-speech') {
-          console.warn('Voice command recognition error:', event.error);
+        if (event.error === 'no-speech') {
+          return;
         }
+
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          isExplicitlyStopped = true;
+          preferences.voiceControl = false;
+          setVoiceState('permission_denied', 'Microphone permission denied. Enable mic in browser settings.');
+          updateUI();
+          announce('Microphone permission denied.');
+          return;
+        }
+
+        if (event.error === 'audio-capture') {
+          isExplicitlyStopped = true;
+          preferences.voiceControl = false;
+          setVoiceState('error', 'No microphone detected on this device.');
+          updateUI();
+          announce('No microphone detected.');
+          return;
+        }
+
+        if (event.error === 'aborted') {
+          return;
+        }
+
+        setVoiceState('error', `Recognition error: ${event.error}`);
       };
 
       recognition.onend = function() {
-        if (preferences.voiceControl) {
-          try { recognition.start(); } catch(e) {}
+        voiceListening = false;
+        // Only restart if voiceControl is still true, not explicitly stopped, and not in an error state
+        if (preferences.voiceControl && !isExplicitlyStopped && voiceState !== 'permission_denied' && voiceState !== 'unsupported') {
+          setTimeout(() => {
+            if (preferences.voiceControl && !isExplicitlyStopped) {
+              try {
+                recognition.start();
+              } catch(e) {}
+            }
+          }, 300);
         }
       };
 
@@ -932,13 +1230,20 @@
       recognitionInstance = recognition;
     } catch (e) {
       console.warn('Unable to initialize voice recognition:', e);
+      preferences.voiceControl = false;
+      setVoiceState('error', 'Unable to start speech recognition.');
+      updateUI();
     }
   }
 
-  function stopVoiceControl() {
+  function stopVoiceControl(explicit) {
+    if (explicit) {
+      isExplicitlyStopped = true;
+    }
+    clearTimeout(voiceFeedbackTimer);
     if (recognitionInstance) {
       try {
-        recognitionInstance.stop();
+        recognitionInstance.abort();
       } catch(e) {}
       recognitionInstance = null;
     }
@@ -946,54 +1251,87 @@
   }
 
   function handleVoiceCommand(cmd) {
-    const vText = shadow.getElementById('accessai-voice-text');
-    if (vText) vText.textContent = `Heard: "${cmd}"`;
+    setVoiceState('processing', `Processing: "${cmd}"`);
 
-    if (cmd.includes('open') || cmd.includes('accessibility') || cmd.includes('menu')) {
-      togglePanel(true);
-      announce('Accessibility panel opened via voice command.');
-    } else if (cmd.includes('close') || cmd.includes('hide')) {
-      togglePanel(false);
-      announce('Accessibility panel closed via voice command.');
-    } else if (cmd.includes('larger text') || cmd.includes('increase text') || cmd.includes('big text')) {
+    let recognized = true;
+
+    if (cmd.includes('increase text') || cmd.includes('larger text') || cmd.includes('bigger text') || cmd.includes('increase font') || cmd.includes('zoom in') || cmd.includes('make text bigger')) {
       const sizes = [100, 110, 120, 130];
       const idx = sizes.indexOf(preferences.fontSize);
       preferences.fontSize = sizes[Math.min(sizes.length - 1, idx + 1)];
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
+      setVoiceState('executed', `Executed: Text size increased to ${preferences.fontSize}%`);
       announce(`Text size increased to ${preferences.fontSize} percent.`);
-    } else if (cmd.includes('smaller text') || cmd.includes('decrease text')) {
+    } else if (cmd.includes('decrease text') || cmd.includes('smaller text') || cmd.includes('smaller font') || cmd.includes('decrease font') || cmd.includes('zoom out') || cmd.includes('make text smaller')) {
       const sizes = [100, 110, 120, 130];
       const idx = sizes.indexOf(preferences.fontSize);
       preferences.fontSize = sizes[Math.max(0, idx - 1)];
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
+      setVoiceState('executed', `Executed: Text size decreased to ${preferences.fontSize}%`);
       announce(`Text size decreased to ${preferences.fontSize} percent.`);
-    } else if (cmd.includes('contrast') || cmd.includes('dark mode')) {
+    } else if (cmd.includes('high contrast') || cmd.includes('contrast') || cmd.includes('dark mode') || cmd.includes('invert colors')) {
       preferences.highContrast = !preferences.highContrast;
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
+      setVoiceState('executed', `Executed: High contrast ${preferences.highContrast ? 'enabled' : 'disabled'}`);
       announce(`High contrast ${preferences.highContrast ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('dyslexia') || cmd.includes('font')) {
+    } else if (cmd.includes('dyslexia') || cmd.includes('dyslexic') || cmd.includes('font')) {
       preferences.dyslexiaFont = !preferences.dyslexiaFont;
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
+      setVoiceState('executed', `Executed: Dyslexia font ${preferences.dyslexiaFont ? 'enabled' : 'disabled'}`);
       announce(`Dyslexia-friendly font ${preferences.dyslexiaFont ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('focus') || cmd.includes('keyboard')) {
+    } else if (cmd.includes('focus') || cmd.includes('keyboard ring') || cmd.includes('highlight')) {
       preferences.focusRing = !preferences.focusRing;
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
+      setVoiceState('executed', `Executed: Focus ring ${preferences.focusRing ? 'enabled' : 'disabled'}`);
       announce(`Focus ring highlight ${preferences.focusRing ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('ruler') || cmd.includes('guide')) {
+    } else if (cmd.includes('ruler') || cmd.includes('guide') || cmd.includes('reading line')) {
       preferences.readingRuler = !preferences.readingRuler;
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
+      setVoiceState('executed', `Executed: Reading ruler ${preferences.readingRuler ? 'enabled' : 'disabled'}`);
       announce(`Reading ruler ${preferences.readingRuler ? 'enabled' : 'disabled'}.`);
-    } else if (cmd.includes('reset') || cmd.includes('normal')) {
-      preferences = Object.assign({}, defaultPrefs);
-      applyHostPreferences();
+    } else if (cmd.includes('reset') || cmd.includes('default') || cmd.includes('normal')) {
+      preferences.fontSize = 100;
+      preferences.dyslexiaFont = false;
+      preferences.highContrast = false;
+      preferences.focusRing = false;
+      preferences.readingRuler = false;
+      // Keep voice active so user can continue issuing voice commands
+      applyHostPreferences({ skipVoice: true });
       updateUI();
-      announce('All accessibility adjustments have been reset.');
+      setVoiceState('executed', 'Executed: Reset settings to default');
+      announce('All accessibility settings restored to default.');
+    } else if (cmd.includes('open') || cmd.includes('accessibility') || cmd.includes('menu') || cmd.includes('show panel')) {
+      togglePanel(true);
+      setVoiceState('executed', 'Executed: Accessibility panel opened');
+    } else if (cmd.includes('close') || cmd.includes('hide')) {
+      togglePanel(false);
+      setVoiceState('executed', 'Executed: Accessibility panel closed');
+    } else if (cmd.includes('stop listening') || cmd.includes('stop voice') || cmd.includes('turn off voice')) {
+      stopVoiceControl(true);
+      preferences.voiceControl = false;
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      setVoiceState('ready', 'Voice navigation stopped');
+      announce('Voice navigation stopped.');
+      return;
+    } else {
+      recognized = false;
+      setVoiceState('listening', `Heard: "${cmd}" (say "Increase text", "High contrast", "Reset")`);
+    }
+
+    if (recognized) {
+      clearTimeout(voiceFeedbackTimer);
+      voiceFeedbackTimer = setTimeout(() => {
+        if (preferences.voiceControl && !isExplicitlyStopped) {
+          setVoiceState('listening');
+        }
+      }, 2200);
     }
   }
 
@@ -1040,7 +1378,7 @@
 
     const voiceBox = shadow.getElementById('accessai-voice-box');
     if (voiceBox) {
-      voiceBox.style.display = preferences.voiceControl ? 'flex' : 'none';
+      voiceBox.style.display = (preferences.voiceControl || voiceState === 'permission_denied' || voiceState === 'error') ? 'flex' : 'none';
     }
 
     updateBadge();
@@ -1056,7 +1394,7 @@
     btn.addEventListener('click', (e) => {
       const size = parseInt(e.currentTarget.getAttribute('data-size'), 10);
       preferences.fontSize = size;
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
       announce(`Text size adjusted to ${size} percent.`);
     });
@@ -1068,7 +1406,7 @@
     if (!card) return;
     const toggle = () => {
       preferences[prefKey] = !preferences[prefKey];
-      applyHostPreferences();
+      applyHostPreferences({ skipVoice: true });
       updateUI();
       announce(`${name} ${preferences[prefKey] ? 'enabled' : 'disabled'}.`);
     };
@@ -1085,12 +1423,69 @@
   setupToggleCard('card-dyslexia', 'dyslexiaFont', 'Dyslexia-friendly font');
   setupToggleCard('card-focus', 'focusRing', 'Visible focus ring');
   setupToggleCard('card-ruler', 'readingRuler', 'Reading ruler');
-  setupToggleCard('card-voice', 'voiceControl', 'Voice navigation commands');
+
+  // Voice Navigation Toggle Card with Stop Propagation
+  const cardVoice = shadow.getElementById('card-voice');
+  if (cardVoice) {
+    const toggleVoice = () => {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        preferences.voiceControl = false;
+        setVoiceState('unsupported');
+        announce('Speech recognition is not supported in this browser.');
+        return;
+      }
+
+      preferences.voiceControl = !preferences.voiceControl;
+      if (preferences.voiceControl) {
+        startVoiceControl();
+        announce('Voice navigation activated. Listening for commands.');
+      } else {
+        stopVoiceControl(true);
+        setVoiceState('ready');
+        announce('Voice navigation stopped.');
+      }
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+    };
+
+    cardVoice.addEventListener('click', (e) => {
+      const target = e.target;
+      if (target && (target.id === 'accessai-voice-stop-btn' || target.closest('#accessai-voice-stop-btn'))) {
+        return;
+      }
+      toggleVoice();
+    });
+
+    cardVoice.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleVoice();
+      }
+    });
+  }
+
+  // Stop Listening Button
+  const stopBtn = shadow.getElementById('accessai-voice-stop-btn');
+  if (stopBtn) {
+    stopBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      preferences.voiceControl = false;
+      stopVoiceControl(true);
+      applyHostPreferences({ skipVoice: true });
+      updateUI();
+      setVoiceState('ready', 'Voice navigation stopped');
+      announce('Voice navigation stopped.');
+    });
+  }
 
   // Reset All
   shadow.getElementById('accessai-reset').addEventListener('click', () => {
     preferences = Object.assign({}, defaultPrefs);
-    applyHostPreferences();
+    stopVoiceControl(true);
+    setVoiceState('ready');
+    applyHostPreferences({ skipVoice: true });
     updateUI();
     announce('All accessibility settings restored to default.');
   });
@@ -1130,6 +1525,15 @@
   }
 
   // Initialize
-  applyHostPreferences();
+  const initialSpeechCheck = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!initialSpeechCheck) {
+    setVoiceState('unsupported');
+  } else {
+    setVoiceState('ready');
+  }
+
+  // Never auto-start microphone on cold page load without user gesture
+  preferences.voiceControl = false;
+  applyHostPreferences({ skipVoice: true });
   updateUI();
 })();

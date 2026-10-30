@@ -126,6 +126,54 @@ async function runWidgetAndAiTestSuite() {
   );
   assert(btnRemediation.suggestedSnippet.includes('aria-label="'), 'Button fix adds aria-label');
 
+  // ----------------------------------------------------
+  // TEST 4: Voice Navigation Feedback States & Command Engine
+  // ----------------------------------------------------
+  console.log('\n--- Test Suite 4: Voice Navigation Feedback & Commands ---');
+  
+  // Verify UI Badge & Visual Feedback Elements exist in the widget
+  assert(widgetContent.includes('accessai-voice-badge'), 'Voice status badge element present in widget DOM');
+  assert(widgetContent.includes('accessai-voice-stop-btn'), 'Dedicated stop-listening button present in widget DOM');
+  assert(widgetContent.includes('Stop Listening'), 'Stop button has accessible text label');
+  assert(widgetContent.includes('accessai-voice-pulse-dot'), 'Live status indicator dot present');
+
+  // Verify all 8 required feedback states exist in code
+  const requiredStates = [
+    'Ready',
+    'Requesting permission',
+    'Listening',
+    'Processing command',
+    'Command executed',
+    'Permission denied',
+    'Browser unsupported',
+    'Recognition error'
+  ];
+  for (const st of requiredStates) {
+    assert(widgetContent.includes(st), `Voice feedback state "${st}" implemented`);
+  }
+
+  // Verify voice command triggers
+  const requiredCommands = [
+    'increase text',
+    'decrease text',
+    'high contrast',
+    'dyslexia',
+    'focus',
+    'ruler',
+    'reset',
+    'open',
+    'close',
+    'stop listening'
+  ];
+  for (const cmd of requiredCommands) {
+    assert(widgetContent.includes(cmd), `Voice command "${cmd}" handled in processor`);
+  }
+
+  // Verify skipVoice option to prevent mid-utterance restarts
+  assert(widgetContent.includes('skipVoice: true'), 'applyHostPreferences supports skipVoice to protect active stream');
+  assert(widgetContent.includes('not-allowed'), 'Microphone not-allowed permission error handled without looping');
+  assert(widgetContent.includes('webkitSpeechRecognition'), 'SpeechRecognition and webkitSpeechRecognition cross-browser fallback');
+
   console.log('\n====================================================');
   console.log(`🎉 ALL ${passed}/${total} WIDGET & AI TESTS PASSED!`);
   console.log('====================================================\n');

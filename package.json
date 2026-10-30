@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "start": "node --experimental-strip-types server/index.ts",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types test/engine.test.ts"
+    "test": "node --experimental-strip-types test/engine.test.ts && node --experimental-strip-types test/widget-and-ai.test.ts && node --experimental-strip-types test/e2e-workflow.test.ts"
   },
   "dependencies": {
     "axe-core": "^4.14.0",

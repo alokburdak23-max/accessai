@@ -121,6 +121,17 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
     Brain: Brain
   };
 
+  const critCount = issues.filter((i) => i.severity === 'critical').length;
+  const serCount = issues.filter((i) => i.severity === 'serious').length;
+  const modCount = issues.filter((i) => i.severity === 'moderate').length;
+  const minCount = issues.filter((i) => i.severity === 'minor').length;
+
+  const currentScore = sortedHistory.length > 0 
+    ? sortedHistory[0].score 
+    : (issues.length === 0 ? 100 : Math.max(10, Math.round(100 - (critCount * 12 + serCount * 6 + modCount * 2 + minCount * 0.5))));
+  const scoreUplift = Math.max(0, 100 - currentScore);
+  const targetScore = Math.min(100, currentScore + scoreUplift);
+
   // Group recommendations by priority tier
   const immediateFixes = recommendations.filter((r) => r.priorityTier === 'Fix Immediately');
   const nextFixes = recommendations.filter((r) => r.priorityTier === 'Fix Next');
@@ -266,29 +277,35 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {rootCauses.map((rc) => (
-                <div
-                  key={rc.id}
-                  className="p-4 rounded-xl bg-[#FAFAF8] border border-[#EAEAE4] space-y-2.5 hover:border-[#C96F82] transition-all"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#292A27]">{rc.pattern}</span>
-                    <span className="text-xs font-bold text-[#A84F65]">
-                      {rc.percentageOfIssues}% of barriers
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-[#70716B]">
-                    <strong className="text-[#292A27]">Underlying Cause: </strong>
-                    {rc.rootCause}
-                  </p>
-
-                  <div className="p-2.5 rounded-lg bg-white border border-[#EAEAE4] text-xs text-[#62683F]">
-                    <strong className="text-[#292A27]">Suggested Remediation: </strong>
-                    {rc.suggestedSolution}
-                  </div>
+              {rootCauses.length === 0 ? (
+                <div className="col-span-2 p-8 text-center rounded-xl bg-[#FAFAF8] border border-[#EAEAE4] text-xs text-[#70716B]">
+                  No recurring root causes identified yet. Scan a website to generate systemic failure pattern diagnostics.
                 </div>
-              ))}
+              ) : (
+                rootCauses.map((rc) => (
+                  <div
+                    key={rc.id}
+                    className="p-4 rounded-xl bg-[#FAFAF8] border border-[#EAEAE4] space-y-2.5 hover:border-[#C96F82] transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#292A27]">{rc.pattern}</span>
+                      <span className="text-xs font-bold text-[#A84F65]">
+                        {rc.percentageOfIssues}% of barriers
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[#70716B]">
+                      <strong className="text-[#292A27]">Underlying Cause: </strong>
+                      {rc.rootCause}
+                    </p>
+
+                    <div className="p-2.5 rounded-lg bg-white border border-[#EAEAE4] text-xs text-[#62683F]">
+                      <strong className="text-[#292A27]">Suggested Remediation: </strong>
+                      {rc.suggestedSolution}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </section>
 
@@ -390,19 +407,21 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div className="p-4 rounded-xl bg-[#FAFAF8] border border-[#EAEAE4]">
                 <span className="text-xs text-[#70716B] font-semibold">Current Measured Score</span>
-                <div className="text-2xl font-extrabold text-[#292A27] mt-1">76 / 100</div>
-                <span className="text-[11px] text-[#A84F65] font-semibold">Needs Improvement</span>
+                <div className="text-2xl font-extrabold text-[#292A27] mt-1">{currentScore} / 100</div>
+                <span className="text-[11px] text-[#A84F65] font-semibold">
+                  {currentScore >= 90 ? 'Optimal Accessibility' : currentScore >= 70 ? 'Needs Improvement' : 'High Barrier Risk'}
+                </span>
               </div>
 
               <div className="p-4 rounded-xl bg-[#FAFAF8] border border-[#EAEAE4]">
                 <span className="text-xs text-[#70716B] font-semibold">Estimated Score Uplift</span>
-                <div className="text-2xl font-extrabold text-[#648568] mt-1">+24 Points</div>
+                <div className="text-2xl font-extrabold text-[#648568] mt-1">+{scoreUplift} Points</div>
                 <span className="text-[11px] text-[#648568] font-semibold">Upon Level A & AA fixes</span>
               </div>
 
               <div className="p-4 rounded-xl bg-[#FAFAF8] border border-[#EAEAE4]">
                 <span className="text-xs text-[#70716B] font-semibold">Projected Target Score</span>
-                <div className="text-2xl font-extrabold text-[#A84F65] mt-1">100 / 100</div>
+                <div className="text-2xl font-extrabold text-[#A84F65] mt-1">{targetScore} / 100</div>
                 <span className="text-[11px] text-[#7B8053] font-semibold">Full AA Compliance</span>
               </div>
             </div>

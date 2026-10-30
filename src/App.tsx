@@ -141,35 +141,41 @@ export const App: React.FC = () => {
         };
       });
 
-  // Derive human user impact breakdown from actual issues
+  // Derive human user impact breakdown from actual issues (100% issue accounting, no omissions)
   const displayUserImpacts: UserImpactCategory[] = isDemoMode
     ? mockUserImpacts
     : [
         {
-          group: 'Screen Reader & Braille Users',
+          group: 'Screen Reader & Assistive Tech',
           barrierCount: displayIssues.filter(
-            (i) =>
-              i.category === 'Images & Media' ||
-              i.category === 'ARIA & Screen Readers' ||
-              i.category === 'Forms & Controls'
+            (i) => i.category === 'Images & Media' || i.category === 'ARIA & Screen Readers'
           ).length,
           description:
-            'Encounter missing image text descriptions, unannounced interactive controls, and unlabeled form elements.',
+            'Encounter missing image text descriptions, unannounced SVG graphics, and broken ARIA accessibility trees.',
           severityLevel: 'High',
           icon: 'EyeOff',
           primaryAssistanceTech: 'NVDA, JAWS, VoiceOver, Braille Displays'
         },
         {
-          group: 'Keyboard-Only & Switch Users',
+          group: 'Keyboard & Motor Navigators',
           barrierCount: displayIssues.filter((i) => i.category === 'Keyboard & Navigation').length,
           description:
-            'Struggle with non-focusable click containers, missing focus indicators, and trapped tab sequences.',
+            'Struggle with non-focusable click containers, invisible focus indicators, and trapped tab navigation.',
           severityLevel: 'High',
           icon: 'Keyboard',
           primaryAssistanceTech: 'Keyboard Tab Navigation, Switch Hardware'
         },
         {
-          group: 'Low-Vision Users',
+          group: 'Form & Input Visitors',
+          barrierCount: displayIssues.filter((i) => i.category === 'Forms & Controls').length,
+          description:
+            'Encounter unlabeled inputs, missing fieldset groupings, and inaccessible action triggers.',
+          severityLevel: 'High',
+          icon: 'Users',
+          primaryAssistanceTech: 'Voice Dictation, Assistive Form Fillers, Screen Readers'
+        },
+        {
+          group: 'Low-Vision & Color-Blind Users',
           barrierCount: displayIssues.filter((i) => i.category === 'Color & Contrast').length,
           description:
             'Experience difficulty reading sub-4.5:1 text contrast and low-luminance interactive boundaries.',
@@ -188,7 +194,83 @@ export const App: React.FC = () => {
         }
       ];
 
-  const displayRootCauses: RootCausePattern[] = isDemoMode ? mockRootCauses : [];
+  // Derive dynamic root causes from real audit issues
+  const displayRootCauses: RootCausePattern[] = isDemoMode
+    ? mockRootCauses
+    : (() => {
+        if (displayIssues.length === 0) return [];
+        const patternMap: Record<
+          string,
+          { pattern: string; rootCause: string; severity: any; solution: string; count: number }
+        > = {
+          'image-alt': {
+            pattern: 'Uncaptioned Visual Assets in Templates',
+            rootCause: 'CMS and template image components rendered without required alt attributes.',
+            severity: 'critical',
+            solution: 'Enforce non-empty alt props on image components or alt="" for decorative images.',
+            count: 0
+          },
+          'color-contrast': {
+            pattern: 'Low-Luminance Theme Color Tokens',
+            rootCause: 'Brand stylesheet palette pairs text and backgrounds failing WCAG 4.5:1 ratio.',
+            severity: 'serious',
+            solution: 'Adjust background luminance or text darkness token to exceed 4.5:1 contrast.',
+            count: 0
+          },
+          'label': {
+            pattern: 'Orphaned Form Inputs & Search Fields',
+            rootCause: 'Input elements rely purely on placeholder text without programmatic <label> or aria-label.',
+            severity: 'serious',
+            solution: 'Associate <label for="..."> with every form field or provide aria-label.',
+            count: 0
+          },
+          'button-name': {
+            pattern: 'Icon-Only Interactive Action Buttons',
+            rootCause: 'Buttons containing only SVG or icon fonts lack discernible accessible text.',
+            severity: 'critical',
+            solution: 'Add aria-label describing button action and set aria-hidden="true" on icons.',
+            count: 0
+          },
+          'link-name': {
+            pattern: 'Vague or Non-Descriptive Hyperlinks',
+            rootCause: 'Links contain generic text ("click here", "more") or icons without accessible text.',
+            severity: 'serious',
+            solution: 'Provide contextual link text or add aria-label describing destination.',
+            count: 0
+          }
+        };
+
+        displayIssues.forEach((issue) => {
+          const ruleKey = issue.ruleId || '';
+          if (ruleKey && patternMap[ruleKey]) {
+            patternMap[ruleKey].count++;
+          } else {
+            const genericKey = issue.category;
+            if (!patternMap[genericKey]) {
+              patternMap[genericKey] = {
+                pattern: `${issue.category} Inconsistencies`,
+                rootCause: `Template components fail ${issue.wcagCriteria} specifications.`,
+                severity: issue.severity,
+                solution: issue.recommendedAction,
+                count: 0
+              };
+            }
+            patternMap[genericKey].count++;
+          }
+        });
+
+        return Object.entries(patternMap)
+          .filter(([_, data]) => data.count > 0)
+          .map(([id, data]) => ({
+            id: `rc-${id}`,
+            pattern: data.pattern,
+            rootCause: data.rootCause,
+            affectedElementsCount: data.count,
+            severity: data.severity,
+            suggestedSolution: data.solution,
+            percentageOfIssues: Math.round((data.count / displayIssues.length) * 100)
+          }));
+      })();
 
   // Derive top recommendations from real issues
   const displayRecommendations: AIRecommendation[] = isDemoMode
@@ -327,6 +409,9 @@ export const App: React.FC = () => {
         break;
       case 'fixes':
         targetPage = 'fixes';
+        break;
+      case 'widget':
+        targetPage = 'widget';
         break;
       case 'insights':
       case 'history':

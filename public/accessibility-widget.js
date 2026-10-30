@@ -77,6 +77,12 @@
     hostStyleTag.id = hostStyleId;
     hostStyleTag.textContent = `
       /* AccessAI Host Page Overrides */
+      @font-face {
+        font-family: 'OpenDyslexic';
+        src: url('https://cdn.jsdelivr.net/npm/opendyslexic@0.1.1/OpenDyslexic-Regular.otf') format('opentype');
+        font-display: swap;
+      }
+
       html.accessai-font-110 { font-size: 110% !important; }
       html.accessai-font-120 { font-size: 120% !important; }
       html.accessai-font-130 { font-size: 130% !important; }

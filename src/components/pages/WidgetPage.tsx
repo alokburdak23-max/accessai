@@ -38,6 +38,48 @@ export const WidgetPage: React.FC<WidgetPageProps> = ({
   const [copied, setCopied] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'html' | 'react' | 'wordpress' | 'shopify'>('html');
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [widgetEnabled, setWidgetEnabled] = useState<boolean>(true);
+  const [isValidatingDomain, setIsValidatingDomain] = useState<boolean>(false);
+  const [domainValidated, setDomainValidated] = useState<boolean | null>(null);
+
+  const handleGenerateSiteId = () => {
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const hostClean = domain ? domain.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_').slice(0, 12) : 'site';
+    const newId = `${hostClean}_${randomSuffix}`;
+    setSiteId(newId);
+    onAddToast({
+      type: 'info',
+      title: 'New Site ID Generated',
+      message: `Assigned identifier: ${newId}`
+    });
+  };
+
+  const handleValidateDomain = () => {
+    try {
+      setIsValidatingDomain(true);
+      const urlToTest = domain.startsWith('http') ? domain : `https://${domain}`;
+      const parsed = new URL(urlToTest);
+      if (!parsed.hostname || parsed.hostname.length < 3) {
+        throw new Error('Invalid domain name format');
+      }
+      setDomain(urlToTest);
+      setDomainValidated(true);
+      onAddToast({
+        type: 'success',
+        title: 'Domain Validated',
+        message: `${parsed.hostname} conforms to W3C URL format.`
+      });
+    } catch {
+      setDomainValidated(false);
+      onAddToast({
+        type: 'warning',
+        title: 'Invalid Domain',
+        message: 'Please provide a valid URL (e.g. https://your-website.com)'
+      });
+    } finally {
+      setIsValidatingDomain(false);
+    }
+  };
 
   // Widget settings
   const [position, setPosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
@@ -163,25 +205,62 @@ export const WidgetPage: React.FC<WidgetPageProps> = ({
                 <Globe className="w-4 h-4 text-[#7B8053]" />
                 <h3 className="text-sm font-bold text-[#292A27]">Registered Target Domain</h3>
               </div>
-              <span className="text-[11px] font-bold text-[#7B8053] bg-[#F6F7F0] px-2.5 py-0.5 rounded-full border border-[#EEF0E3]">
-                Shadow DOM Isolated
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setWidgetEnabled((prev) => !prev)}
+                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
+                    widgetEnabled
+                      ? 'bg-[#F2F7F3] text-[#648568] border-[#E2EDE4]'
+                      : 'bg-[#FFF5F6] text-[#C94F55] border-[#F8E9ED]'
+                  }`}
+                >
+                  {widgetEnabled ? '● Widget Active' : '○ Widget Disabled'}
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#292A27]">Target Website URL</label>
-                <input
-                  type="text"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  placeholder="https://example.com"
-                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#FAFAF8] border border-[#EAEAE4] focus:outline-none focus:border-[#C96F82] focus:ring-1 focus:ring-[#C96F82] text-[#292A27]"
-                />
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-[#292A27]">Target Website URL</label>
+                  <button
+                    type="button"
+                    onClick={handleValidateDomain}
+                    disabled={isValidatingDomain}
+                    className="text-[10px] font-bold text-[#A84F65] hover:underline"
+                  >
+                    {isValidatingDomain ? 'Validating...' : 'Validate Domain'}
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={domain}
+                    onChange={(e) => {
+                      setDomain(e.target.value);
+                      setDomainValidated(null);
+                    }}
+                    placeholder="https://example.com"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-[#FAFAF8] border border-[#EAEAE4] focus:outline-none focus:border-[#C96F82] focus:ring-1 focus:ring-[#C96F82] text-[#292A27]"
+                  />
+                  {domainValidated === true && (
+                    <span className="absolute right-2.5 top-2 text-[#648568] text-xs font-bold">✓</span>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#292A27]">Site ID Identifier</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-[#292A27]">Site ID Identifier</label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateSiteId}
+                    className="text-[10px] font-bold text-[#7B8053] hover:underline"
+                  >
+                    Generate ID
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={siteId}

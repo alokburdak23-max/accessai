@@ -198,6 +198,9 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
     issues.length === 0 ? 100 : Math.max(10, Math.round(100 - (stats.critical * 12 + stats.serious * 6 + stats.moderate * 2 + stats.minor * 0.5)))
   );
   const pagesScanned = activeScan?.pagesScanned ?? Math.max(1, new Set(issues.map((i) => i.affectedPage)).size);
+  const pagesWithViolations = new Set(issues.map((i) => i.affectedPage)).size;
+  const pagesWithoutViolations = Math.max(0, pagesScanned - pagesWithViolations);
+  const pagesFailed = activeScan?.pagesFailed ?? 0;
   const elementsAnalyzed = issues.length * 12 + 180;
 
   const wcagA = activeScan?.scoreBreakdown?.wcagCompliance?.levelA || {
@@ -212,6 +215,10 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
     status: 'Advisory Review',
     passRatePct: Math.max(40, 100 - (stats.critical * 5 + stats.serious * 4 + stats.moderate * 2))
   };
+
+  const p1Score = Math.min(100, effectiveScore + Math.max(1, stats.critical * 6));
+  const p2Score = Math.min(100, p1Score + Math.max(1, stats.serious * 4));
+  const p3Score = Math.min(100, p2Score + Math.max(1, stats.moderate * 2));
 
   const handleDownloadReport = () => {
     const reportContent = {
@@ -359,9 +366,9 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
         <div className="p-6 sm:p-7 rounded-2xl bg-white border border-[#EAEAE4] shadow-card space-y-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="p-4 rounded-xl bg-[#FAFAF8] border border-[#EAEAE4]">
-              <span className="text-xs font-medium text-[#70716B]">Audited Scope</span>
+              <span className="text-xs font-medium text-[#70716B]">Pages Crawled</span>
               <p className="text-2xl font-black text-[#292A27] mt-1">{pagesScanned}</p>
-              <span className="text-[11px] text-[#7B8053] font-medium">Scanned page routes</span>
+              <span className="text-[11px] text-[#7B8053] font-medium">{pagesWithViolations} with barriers • {pagesWithoutViolations} clean{pagesFailed > 0 ? ` • ${pagesFailed} failed` : ''}</span>
             </div>
             <div className="p-4 rounded-xl bg-[#FAFAF8] border border-[#EAEAE4]">
               <span className="text-xs font-medium text-[#70716B]">Evaluated Elements</span>
@@ -371,7 +378,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
             <div className="p-4 rounded-xl bg-[#FFF5F6] border border-[#F8E9ED]">
               <span className="text-xs font-medium text-[#A84F65]">Active Barriers</span>
               <p className="text-2xl font-black text-[#C94F55] mt-1">{stats.remainingCount}</p>
-              <span className="text-[11px] text-[#A84F65] font-medium">{stats.critical} Critical blockers</span>
+              <span className="text-[11px] text-[#A84F65] font-medium">{stats.critical} Critical • {stats.serious} Serious</span>
             </div>
             <div className="p-4 rounded-xl bg-[#F6F7F0] border border-[#EEF0E3]">
               <span className="text-xs font-medium text-[#7B8053]">Resolved Barriers</span>
@@ -971,7 +978,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
                   Phase 1 • Days 1–3
                 </span>
                 <span className="text-xs font-bold text-[#648568] bg-[#EEF0E3] px-2 py-0.5 rounded-full">
-                  +6 pts
+                  +{p1Score - effectiveScore} pts
                 </span>
               </div>
               <h3 className="text-sm font-extrabold text-[#292A27] mt-2">Critical Blockers</h3>
@@ -983,7 +990,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
             <div className="pt-3 border-t border-[#EAEAE4] text-xs">
               <div className="flex justify-between text-[#70716B]">
                 <span>Projected Score:</span>
-                <strong className="text-[#292A27]">76 → 82</strong>
+                <strong className="text-[#292A27]">{effectiveScore} → {p1Score}</strong>
               </div>
               <div className="flex justify-between text-[#70716B] mt-1">
                 <span>Effort Estimate:</span>
@@ -1001,7 +1008,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
                   Phase 2 • Days 4–7
                 </span>
                 <span className="text-xs font-bold text-[#648568] bg-[#EEF0E3] px-2 py-0.5 rounded-full">
-                  +5 pts
+                  +{p2Score - p1Score} pts
                 </span>
               </div>
               <h3 className="text-sm font-extrabold text-[#292A27] mt-2">Serious Usability</h3>
@@ -1013,7 +1020,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
             <div className="pt-3 border-t border-[#EAEAE4] text-xs">
               <div className="flex justify-between text-[#70716B]">
                 <span>Projected Score:</span>
-                <strong className="text-[#292A27]">82 → 87</strong>
+                <strong className="text-[#292A27]">{p1Score} → {p2Score}</strong>
               </div>
               <div className="flex justify-between text-[#70716B] mt-1">
                 <span>Effort Estimate:</span>
@@ -1031,7 +1038,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
                   Phase 3 • Days 8–10
                 </span>
                 <span className="text-xs font-bold text-[#648568] bg-[#EEF0E3] px-2 py-0.5 rounded-full">
-                  +4 pts
+                  +{p3Score - p2Score} pts
                 </span>
               </div>
               <h3 className="text-sm font-extrabold text-[#292A27] mt-2">Contrast Tokens</h3>
@@ -1043,7 +1050,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
             <div className="pt-3 border-t border-[#EAEAE4] text-xs">
               <div className="flex justify-between text-[#70716B]">
                 <span>Projected Score:</span>
-                <strong className="text-[#292A27]">87 → 91</strong>
+                <strong className="text-[#292A27]">{p2Score} → {p3Score}</strong>
               </div>
               <div className="flex justify-between text-[#70716B] mt-1">
                 <span>Effort Estimate:</span>

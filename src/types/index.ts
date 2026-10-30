@@ -29,6 +29,7 @@ export interface AccessibilityIssue {
   affectedElement: string;
   selector: string;
   elementCount: number;
+  ruleId?: string;
   
   // Level 1: Simple Human Explanation
   problemExplanation: string;

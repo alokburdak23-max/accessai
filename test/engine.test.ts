@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 import http from 'http';
 import { validateScanUrl } from '../server/security.ts';
 import { launchAuditBrowser } from '../server/browser.ts';

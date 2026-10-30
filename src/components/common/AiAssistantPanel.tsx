@@ -282,7 +282,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-[2147483648] overflow-hidden">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-[#292A27]/40 backdrop-blur-sm transition-opacity"

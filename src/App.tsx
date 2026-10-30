@@ -78,6 +78,20 @@ export const App: React.FC = () => {
     loadDatabaseState();
   }, [loadDatabaseState]);
 
+  // Ensure the AccessAI standalone accessibility widget launcher is active across the entire application
+  useEffect(() => {
+    if (!document.querySelector('accessai-widget')) {
+      const existingScript = document.querySelector('script[src*="accessibility-widget.js"]');
+      if (!existingScript) {
+        const script = document.createElement('script');
+        script.src = '/accessibility-widget.js';
+        script.setAttribute('data-site-id', 'accessai_app');
+        script.defer = true;
+        document.body.appendChild(script);
+      }
+    }
+  }, []);
+
   // Determine current active scan
   const activeScan = scans.find((s) => s.scanId === currentScanId) || scans[0] || null;
 

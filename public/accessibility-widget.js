@@ -9,9 +9,10 @@
   'use strict';
 
   // Prevent multiple injections
-  if (document.querySelector('accessai-widget')) {
+  if (window.__accessaiWidgetLoaded || document.querySelector('accessai-widget')) {
     return;
   }
+  window.__accessaiWidgetLoaded = true;
 
   // Identify host script & configuration
   const currentScript = document.currentScript || (function() {
@@ -159,7 +160,9 @@
   if (!rulerEl) {
     rulerEl = document.createElement('div');
     rulerEl.id = 'accessai-reading-ruler-bar';
-    document.body.appendChild(rulerEl);
+    if (document.body) {
+      document.body.appendChild(rulerEl);
+    }
   }
 
   window.addEventListener('mousemove', function(e) {
@@ -351,6 +354,23 @@
       opacity: 1;
       transform: translateY(0) scale(1);
       pointer-events: auto;
+    }
+
+    @media (max-width: 480px) {
+      .accessai-launcher {
+        bottom: 16px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
+      }
+      .accessai-panel {
+        bottom: 74px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-width: calc(100vw - 24px);
+        max-height: calc(100vh - 90px);
+      }
     }
 
     /* Panel Header */
@@ -1288,7 +1308,22 @@
   `;
 
   shadow.appendChild(rootDiv);
-  document.body.appendChild(widgetContainer);
+
+  function mountWidget() {
+    if (!document.body) return;
+    if (rulerEl && !document.getElementById('accessai-reading-ruler-bar')) {
+      document.body.appendChild(rulerEl);
+    }
+    if (!document.querySelector('accessai-widget')) {
+      document.body.appendChild(widgetContainer);
+    }
+  }
+
+  if (document.body) {
+    mountWidget();
+  } else {
+    document.addEventListener('DOMContentLoaded', mountWidget);
+  }
 
   // Announce to Screen Readers
   function announce(message) {
@@ -1634,8 +1669,8 @@
     } else if (cmd.startsWith('open link ') || (cmd.startsWith('open ') && !cmd.includes('settings') && !cmd.includes('panel') && !cmd.includes('menu') && !cmd.includes('accessibility'))) {
       const targetQuery = cmd.replace(/^open link /, '').replace(/^open /, '').trim();
       if (targetQuery.length > 1) {
-        const links = Array.from(document.querySelectorAll('a[href]'));
-        const matched = links.find(l => {
+        const clickable = Array.from(document.querySelectorAll('a[href], button, [role="button"], [role="link"], nav button'));
+        const matched = clickable.find(l => {
           const txt = (l.textContent || '').trim().toLowerCase();
           const aria = (l.getAttribute('aria-label') || '').trim().toLowerCase();
           const title = (l.getAttribute('title') || '').trim().toLowerCase();
@@ -1643,15 +1678,15 @@
         });
 
         if (matched) {
-          setVoiceState('executed', `Executed: Opening link "${targetQuery}"`);
-          announce(`Opening link ${targetQuery}.`);
+          setVoiceState('executed', `Executed: Opening "${targetQuery}"`);
+          announce(`Opening ${targetQuery}.`);
           setTimeout(() => {
             matched.click();
           }, 700);
           return;
         } else {
-          setVoiceState('listening', `Link matching "${targetQuery}" not found`);
-          announce(`Link ${targetQuery} not found on this page.`);
+          setVoiceState('listening', `Target matching "${targetQuery}" not found`);
+          announce(`Target ${targetQuery} not found on this page.`);
         }
       }
     } 
@@ -1979,4 +2014,16 @@
   preferences.voiceControl = false;
   applyHostPreferences({ skipVoice: true });
   updateUI();
+
+  // Expose clean public interface on window for programmatic control & testing
+  window.AccessAI = {
+    toggle: () => togglePanel(),
+    open: () => togglePanel(true),
+    close: () => togglePanel(false),
+    getPreferences: () => Object.assign({}, preferences),
+    switchView: (view) => switchWidgetView(view),
+    isVoiceListening: () => voiceListening,
+    getVoiceState: () => voiceState,
+    handleVoiceCommand: (cmd) => handleVoiceCommand(cmd)
+  };
 })();

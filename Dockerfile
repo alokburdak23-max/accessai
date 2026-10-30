@@ -41,15 +41,18 @@ ENV PORT=3000
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies (include devDependencies for tsc & vite frontend compilation)
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # Copy project source code
 COPY . .
 
 # Build production frontend client into dist/
 RUN npm run build
+
+# Remove development dependencies to keep final image lean and secure
+RUN npm prune --omit=dev
 
 # Create data directory with write permissions for persistent disk mounting
 RUN mkdir -p /app/data && chmod 777 /app/data

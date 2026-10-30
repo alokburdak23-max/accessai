@@ -37,7 +37,7 @@ if (fs.existsSync(distPath)) {
 }
 
 // SPA fallback for frontend client routing
-app.get('*', (req, res) => {
+app.use((req, res) => {
   // If requesting an API or widget route that wasn't matched, return 404
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API route not found' });

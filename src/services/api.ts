@@ -238,7 +238,7 @@ export const api = {
   },
 
   /**
-   * Ask AccessAI conversational consultant
+   * Ask NETRA conversational consultant (Powered by AccessAI)
    */
   async askAi(question: string, scanContext: any): Promise<any> {
     const res = await fetch('/api/ai/ask', {

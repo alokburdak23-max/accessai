@@ -95,7 +95,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#70716B]">
             <span className="hover:text-[#A84F65] cursor-pointer" onClick={() => onNavigate('dashboard')}>
-              AccessAI
+              NETRA
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-[#999A92]" />
             <span className="text-[#A84F65] font-semibold">
@@ -231,10 +231,10 @@ export const Topbar: React.FC<TopbarProps> = ({
         <button
           onClick={() => onNavigate('settings')}
           className="w-8 h-8 rounded-full bg-[#F8E9ED] border border-[#C96F82] p-0.5 focus:outline-none focus:ring-2 focus:ring-[#C96F82]"
-          title="Alex Vance (Settings)"
+          title="Team AccessAI (Settings)"
         >
           <div className="w-full h-full rounded-full flex items-center justify-center text-xs font-bold text-[#A84F65]">
-            AV
+            TA
           </div>
         </button>
       </div>

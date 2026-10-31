@@ -160,10 +160,10 @@ export const FixSuggestionsPage: React.FC<FixSuggestionsPageProps> = ({
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292A27] tracking-tight">
-            AI Code Fix Suggestions
+            NETRA AI Fix Generator
           </h1>
           <p className="text-xs sm:text-sm text-[#70716B] mt-1 max-w-2xl leading-relaxed">
-            Review proposed accessible markup solutions, inspect side-by-side code diffs, and manage your remediation review lifecycle.
+            Making the Digital World Accessible to Everyone. Actionable HTML/CSS accessible repairs powered by AccessAI.
           </p>
         </div>
 

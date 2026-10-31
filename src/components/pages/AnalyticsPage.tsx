@@ -153,10 +153,10 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292A27] tracking-tight">
-            Analytics & AI Insights
+            NETRA Analytics & Insights
           </h1>
           <p className="text-xs sm:text-sm text-[#70716B] mt-1 max-w-2xl leading-relaxed">
-            Understand how digital barriers restrict real assistive technology visitors, diagnose recurring root causes, and track audit score progress over time.
+            Making the Digital World Accessible to Everyone. Longitudinal compliance analytics and assistive technology impact analysis powered by AccessAI.
           </p>
         </div>
 

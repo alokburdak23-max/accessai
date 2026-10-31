@@ -302,7 +302,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-[#292A27]">AccessAI Assistant</h3>
+                  <h3 className="text-base font-bold text-[#292A27]">NETRA AI Assistant</h3>
                   <span
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       aiSettings.isConfigured
@@ -315,7 +315,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-[#70716B] truncate max-w-xs sm:max-w-md">
-                  Active Target: <span className="font-semibold text-[#292A27]">{activeScan?.websiteUrl || 'No active website scan'}</span>
+                  Powered by AccessAI • Active Target: <span className="font-semibold text-[#292A27]">{activeScan?.websiteUrl || 'No active website scan'}</span>
                 </p>
               </div>
             </div>
@@ -362,7 +362,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
               }`}
             >
               <HelpCircle className="w-3.5 h-3.5" />
-              Ask AccessAI
+              Ask NETRA
             </button>
           </div>
 
@@ -506,7 +506,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
                   <div>
                     <h5 className="text-xs font-bold text-[#292A27]">Need advice on your audit?</h5>
                     <p className="text-[11px] text-[#70716B] mt-0.5">
-                      Ask AccessAI how to boost your score to {Math.min(100, metrics.score + 15)}+.
+                      Ask NETRA how to boost your score to {Math.min(100, metrics.score + 15)}+.
                     </p>
                   </div>
                   <button
@@ -741,8 +741,11 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
                     <div className="text-center py-10 px-4">
                       <Sparkles className="w-8 h-8 text-[#C96F82] mx-auto mb-2 opacity-80" />
                       <h4 className="text-sm font-bold text-[#292A27]">
-                        AccessAI Accessibility Consultant
+                        NETRA Accessibility Consultant
                       </h4>
+                      <p className="text-[11px] font-semibold text-[#A84F65] mt-0.5">
+                        Powered by AccessAI
+                      </p>
                       <p className="text-xs text-[#70716B] max-w-sm mx-auto mt-1">
                         Ask any question about your website’s accessibility barriers, WCAG 2.1 compliance, or remediation strategies.
                       </p>
@@ -788,7 +791,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
                   {isAsking && (
                     <div className="flex items-center gap-2 p-3 bg-white rounded-2xl border border-[#EAEAE4] text-xs text-[#7B8053] animate-pulse">
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>AccessAI is evaluating your audit context...</span>
+                      <span>NETRA is evaluating your audit context...</span>
                     </div>
                   )}
                   <div ref={messagesEndRef} />
@@ -806,7 +809,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
                     type="text"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Ask about contrast, screen readers, WCAG, or fixes..."
+                    placeholder="Ask NETRA about contrast, screen readers, WCAG, or fixes..."
                     disabled={isAsking}
                     className="flex-1 text-xs bg-[#FAFAF8] border border-[#EAEAE4] rounded-xl px-4 py-3 text-[#292A27] focus:outline-none focus:ring-2 focus:ring-[#C96F82] disabled:opacity-60"
                   />
@@ -814,7 +817,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
                     type="submit"
                     disabled={!inputText.trim() || isAsking}
                     className="px-4 py-3 rounded-xl bg-[#C96F82] hover:bg-[#A84F65] disabled:bg-[#EAEAE4] text-white disabled:text-[#70716B] text-xs font-bold flex items-center justify-center transition-colors shadow-rose-sm"
-                    aria-label="Send message to AccessAI"
+                    aria-label="Send message to NETRA AI Assistant"
                   >
                     <Send className="w-4 h-4" />
                   </button>
@@ -829,7 +832,7 @@ export const AiAssistantPanel: React.FC<AiAssistantPanelProps> = ({
               <ShieldAlert className="w-3.5 h-3.5 text-[#7B8053]" />
               Secure Audit Context (Zero credentials or API keys exposed)
             </span>
-            <span>AccessAI v1.4.0</span>
+            <span>NETRA v1.4.0 • Powered by AccessAI</span>
           </div>
         </div>
       </div>

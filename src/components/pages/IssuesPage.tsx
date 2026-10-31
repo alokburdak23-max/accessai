@@ -119,10 +119,10 @@ export const IssuesPage: React.FC<IssuesPageProps> = ({
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292A27] tracking-tight">
-            Scan Results & Accessibility Issues
+            NETRA Audit Results & Issues
           </h1>
           <p className="text-xs sm:text-sm text-[#70716B] mt-1 max-w-3xl leading-relaxed">
-            Plain-language barrier explanations for designers and managers, with expandable technical markup specifications for engineers.
+            Making the Digital World Accessible to Everyone. Plain-language barrier explanations with technical markup specifications powered by AccessAI.
           </p>
         </div>
 

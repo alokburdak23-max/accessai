@@ -141,10 +141,10 @@ export const ScannerPage: React.FC<ScannerPageProps> = ({
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292A27] tracking-tight">
-              Website Accessibility Scanner
+              NETRA Website Scanner
             </h1>
             <p className="text-xs sm:text-sm text-[#70716B] mt-1 max-w-2xl leading-relaxed">
-              Launch real automated audits across your public web properties using Playwright and axe-core. Uncover WCAG 2.1 AA barriers and verify code-level remediation.
+              Making the Digital World Accessible to Everyone. Launch real automated audits across your public web properties powered by AccessAI.
             </p>
           </div>
 

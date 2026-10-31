@@ -73,10 +73,10 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292A27] tracking-tight">
-              Accessibility Overview
+              NETRA Accessibility Overview
             </h1>
             <p className="text-sm text-[#70716B] mt-2 leading-relaxed">
-              Understand your website accessibility barriers, verify WCAG 2.1 AA compliance, and generate code-level fixes with our automated browser scanning engine.
+              Making the Digital World Accessible to Everyone. Understand your website accessibility barriers, verify WCAG 2.1 AA compliance, and generate code-level fixes powered by AccessAI.
             </p>
           </div>
         </section>
@@ -158,10 +158,10 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292A27] tracking-tight">
-            Accessibility Dashboard
+            NETRA Accessibility Dashboard
           </h1>
           <p className="text-xs sm:text-sm text-[#70716B] mt-1 max-w-2xl leading-relaxed">
-            Continuous audit intelligence for your active domains. Track compliance improvements and verify code-level fixes.
+            Making the Digital World Accessible to Everyone. Continuous audit intelligence for your active domains powered by AccessAI.
           </p>
         </div>
 

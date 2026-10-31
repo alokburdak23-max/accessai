@@ -176,7 +176,7 @@ export const mockIssues: AccessibilityIssue[] = [
     rawHtmlSnippet: `<img src="/hero-analytics-dashboard.webp" class="rounded-xl shadow-lg" />`,
     suggestedFixSnippet: `<img 
   src="/hero-analytics-dashboard.webp" 
-  alt="AccessAI realtime accessibility analytics dashboard displaying compliance score of 76" 
+  alt="NETRA realtime accessibility analytics dashboard displaying compliance score of 76" 
   class="rounded-xl shadow-lg" 
 />`,
     docUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html',
@@ -365,7 +365,7 @@ export const mockIssues: AccessibilityIssue[] = [
   <h2>Security & Compliance Architecture</h2>
 </main>`,
     suggestedFixSnippet: `<main class="security-page">
-  <h1 class="text-2xl font-bold text-slate-900 mb-2">AccessAI Security & Compliance</h1>
+  <h1 class="text-2xl font-bold text-slate-900 mb-2">NETRA Security & Compliance</h1>
   <h2 class="text-lg font-semibold text-slate-700">Architecture & Governance</h2>
 </main>`,
     docUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html',
@@ -457,11 +457,11 @@ export const mockFixSuggestions: FixSuggestion[] = [
 />`,
     suggestedSnippet: `<img 
   src="/hero-analytics-dashboard.webp" 
-  alt="AccessAI realtime accessibility analytics dashboard displaying compliance score of 76 and automated WCAG issue breakdown" 
+  alt="NETRA realtime accessibility analytics dashboard displaying compliance score of 76 and automated WCAG issue breakdown" 
   class="rounded-xl shadow-lg border border-slate-200" 
   loading="lazy" 
 />`,
-    diffSummary: '+ alt="AccessAI realtime accessibility..."\n+ loading="lazy"',
+    diffSummary: '+ alt="NETRA realtime accessibility..."\n+ loading="lazy"',
     status: 'suggested',
     approved: false
   },
@@ -766,10 +766,10 @@ export const mockNotifications: NotificationItem[] = [
 
 export const initialUserSettings: UserSettings = {
   profile: {
-    fullName: 'Alex Vance',
-    email: 'alex.vance@accessai-enterprise.io',
-    role: 'Lead Accessibility Engineer',
-    company: 'Acme Digital Systems'
+    fullName: 'Team AccessAI',
+    email: 'team@netra-accessibility.io',
+    role: 'Lead Accessibility Engineer • SPHINX\'26',
+    company: 'NETRA • Powered by AccessAI'
   },
   aiProvider: {
     provider: 'anthropic',

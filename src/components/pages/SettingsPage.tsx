@@ -223,7 +223,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </h4>
                 </div>
                 <p className="text-xs text-[#70716B] max-w-xl leading-relaxed">
-                  When enabled, AccessAI displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
+                  When enabled, NETRA displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
                 </p>
               </div>
 
@@ -448,7 +448,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </h4>
                 </div>
                 <p className="text-xs text-[#70716B] max-w-xl leading-relaxed">
-                  When enabled, AccessAI displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
+                  When enabled, NETRA displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
                 </p>
               </div>
 
@@ -634,7 +634,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </h4>
                 </div>
                 <p className="text-xs text-[#70716B] max-w-xl leading-relaxed">
-                  When enabled, AccessAI displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
+                  When enabled, NETRA displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
                 </p>
               </div>
 
@@ -697,7 +697,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           <div className="flex items-center justify-between pb-4 border-b border-[#EAEAE4]">
             <div>
               <h3 className="text-base font-bold text-[#292A27]">Alerts & Notification Triggers</h3>
-              <p className="text-xs text-[#70716B]">Control when AccessAI notifies team members</p>
+              <p className="text-xs text-[#70716B]">Control when NETRA notifies team members</p>
             </div>
             <button
               onClick={() => handleSave('Notifications')}
@@ -800,7 +800,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </h4>
                 </div>
                 <p className="text-xs text-[#70716B] max-w-xl leading-relaxed">
-                  When enabled, AccessAI displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
+                  When enabled, NETRA displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
                 </p>
               </div>
 
@@ -975,7 +975,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   </h4>
                 </div>
                 <p className="text-xs text-[#70716B] max-w-xl leading-relaxed">
-                  When enabled, AccessAI displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
+                  When enabled, NETRA displays synthetic demonstration records (acme-store.io) for feature exploration. In real mode (default), only actual website scans from persistent storage are shown.
                 </p>
               </div>
 

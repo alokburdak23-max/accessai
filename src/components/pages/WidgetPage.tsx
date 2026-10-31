@@ -174,10 +174,10 @@ export const WidgetPage: React.FC<WidgetPageProps> = ({
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#292A27] tracking-tight">
-              Standalone Accessibility Widget
+              NETRA Accessibility Layer
             </h1>
             <p className="text-xs sm:text-sm text-[#70716B] mt-1 max-w-2xl leading-relaxed">
-              Equip any external website with an interactive accessibility suite using Shadow DOM isolation. Visitors can scale text, toggle dyslexia fonts, enable high contrast, and navigate using voice recognition.
+              Making the Digital World Accessible to Everyone. Equip any external website with the NETRA interactive accessibility suite powered by AccessAI.
             </p>
           </div>
 
@@ -610,7 +610,7 @@ export const WidgetPage: React.FC<WidgetPageProps> = ({
               <h4 className="text-xs font-bold text-[#292A27]">Complies with International Standards</h4>
             </div>
             <p className="text-xs text-[#70716B] leading-relaxed">
-              The AccessAI accessibility layer delivers immediate usability enhancements for visitors with low vision, motor impairments, dyslexia, and ADHD, supporting ADA Title III, Section 508, and EAA requirements.
+              The NETRA accessibility layer delivers immediate usability enhancements for visitors with low vision, motor impairments, dyslexia, and ADHD, supporting ADA Title III, Section 508, and EAA requirements.
             </p>
             <div className="pt-1 flex items-center gap-2 text-[11px] font-semibold text-[#7B8053]">
               <span>Keyboard Shortcut:</span>
@@ -706,7 +706,7 @@ export const WidgetPage: React.FC<WidgetPageProps> = ({
             </h2>
 
             <p className={simContrast ? 'text-[#CBD5E1]' : 'text-[#70716B]'}>
-              This preview demonstrator reflects the live transformations applied to the host website when a visitor opens the AccessAI widget. Visitors can dynamically scale typography up to 130%, switch to weighted dyslexia-friendly glyphs, enforce dark high-contrast modes, and speak voice commands.
+              This preview demonstrator reflects the live transformations applied to the host website when a visitor opens the NETRA widget. Visitors can dynamically scale typography up to 130%, switch to weighted dyslexia-friendly glyphs, enforce dark high-contrast modes, and speak voice commands.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">

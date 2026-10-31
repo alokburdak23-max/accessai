@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   ChevronRight,
   ExternalLink,
-  Layers
+  Layers,
+  Eye
 } from 'lucide-react';
 import { PageId } from '../../types';
 
@@ -72,19 +73,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-5 border-b border-[#EAEAE4] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#FFF5F6] border border-[#F8E9ED] flex items-center justify-center text-[#C96F82] shadow-sm">
-              <ShieldCheck className="w-5 h-5" />
+              <Eye className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <h1 className="text-lg font-bold tracking-tight text-[#292A27]">
-                  Access<span className="text-[#C96F82]">AI</span>
+                  NETRA
                 </h1>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#F6F7F0] text-[#7B8053] border border-[#EEF0E3]">
-                  SaaS
+                  SPHINX'26
                 </span>
               </div>
               <p className="text-[10px] text-[#70716B] font-mono tracking-wide">
-                Detect • Repair • Verify
+                Powered by AccessAI
               </p>
             </div>
           </div>
@@ -166,11 +167,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-[#EAEAE4] shadow-card">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-full bg-[#F8E9ED] border border-[#C96F82] flex items-center justify-center text-xs font-bold text-[#A84F65] flex-shrink-0">
-                AV
+                TA
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-[#292A27] truncate">Alex Vance</p>
-                <p className="text-[11px] text-[#70716B] truncate">Lead Accessibility</p>
+                <p className="text-xs font-bold text-[#292A27] truncate">Team AccessAI</p>
+                <p className="text-[11px] text-[#70716B] truncate">SPHINX'26 Presenter</p>
               </div>
             </div>
             <button

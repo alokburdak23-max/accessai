@@ -281,7 +281,7 @@ apiRouter.get('/widget/config/:siteId', (req: Request, res: Response) => {
       success: true,
       siteId,
       domain: 'default',
-      name: 'AccessAI Accessibility Layer',
+      name: 'NETRA Accessibility Layer',
       enabledFeatures: {
         textResize: true,
         dyslexiaFont: true,

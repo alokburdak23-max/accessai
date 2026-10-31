@@ -242,7 +242,8 @@ async function runWidgetAndAiTestSuite() {
   const panelContent = fs.readFileSync(aiPanelPath, 'utf8');
   assert(panelContent.includes('AI Overview & Priorities'), 'Panel implements AI Overview tab');
   assert(panelContent.includes('Explain & Generate Fix'), 'Panel implements Explain & Generate Fix tab');
-  assert(panelContent.includes('Ask AccessAI'), 'Panel implements Ask AccessAI conversational tab');
+  assert(panelContent.includes('Ask NETRA') || panelContent.includes('Ask AccessAI'), 'Panel implements Ask NETRA conversational tab');
+  assert(panelContent.includes('NETRA AI Assistant'), 'Panel displays NETRA AI Assistant branding');
   assert(panelContent.includes('Top 5 Prioritized Remediations'), 'Panel implements Top 5 prioritized fixes');
   assert(panelContent.includes('Copy Code'), 'Panel includes Copy Code button');
   assert(panelContent.includes('Download Patch'), 'Panel includes Download Patch button');
@@ -282,14 +283,17 @@ async function runWidgetAndAiTestSuite() {
   assert(indexContent.includes('accessibility-widget.js'), 'index.html embeds accessibility-widget.js');
   assert(indexContent.includes('data-site-id='), 'index.html defines data-site-id attribute for widget initialization');
   assert(indexContent.includes('defer'), 'index.html uses defer for non-blocking asynchronous execution');
+  assert(indexContent.includes('NETRA'), 'index.html title displays NETRA branding');
 
   // 2. Verify App.tsx contains single initialization safeguard
   assert(appContent.includes('accessai-widget'), 'App.tsx verifies accessai-widget custom element presence');
   assert(appContent.includes('accessibility-widget.js'), 'App.tsx includes widget initialization safeguard');
 
-  // 3. Verify public/accessibility-widget.js duplicate injection prevention
+  // 3. Verify public/accessibility-widget.js duplicate injection prevention & NETRA branding
   assert(widgetContent.includes('__accessaiWidgetLoaded'), 'Widget includes global __accessaiWidgetLoaded guard preventing multiple loads');
   assert(widgetContent.includes('mountWidget'), 'Widget includes safe mountWidget lifecycle for DOM readiness');
+  assert(widgetContent.includes('NETRA'), 'Widget header displays NETRA branding');
+  assert(widgetContent.includes('Powered by AccessAI'), 'Widget displays "Powered by AccessAI" supporting attribution');
 
   // 4. Verify ToastContainer is offset to prevent overlapping launcher button
   const toastContainerPath = path.resolve('src', 'components', 'common', 'ToastContainer.tsx');

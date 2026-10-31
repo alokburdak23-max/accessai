@@ -29,7 +29,7 @@ export const AIInsightsPage: React.FC<AIInsightsPageProps> = ({
   onNavigate,
   userImpacts
 }) => {
-  // Common root-cause patterns analyzed by AccessAI
+  // Common root-cause patterns analyzed by NETRA (Powered by AccessAI)
   const commonProblems = [
     {
       title: 'Missing Image Text Alternatives',

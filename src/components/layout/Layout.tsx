@@ -62,10 +62,10 @@ export const Layout: React.FC<LayoutProps> = ({
         <footer className="border-t border-[#EAEAE4] bg-white px-6 py-4 text-center text-xs text-[#70716B]">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
             <span>
-              <strong className="text-[#A84F65]">AccessAI</strong> • AI-Powered Website Accessibility Intelligence
+              <strong className="text-[#A84F65]">NETRA</strong> • Making the Digital World Accessible to Everyone. <span className="text-[#999A92] font-normal">(Powered by AccessAI)</span>
             </span>
             <span className="text-[#999A92]">
-              Rose & Olive Theme • Designed for WCAG 2.1 AA Compliance
+              Team AccessAI • SPHINX'26 Hackathon • WCAG 2.1 AA Compliant
             </span>
           </div>
         </footer>

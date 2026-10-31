@@ -53,7 +53,7 @@
   let siteConfig = {
     position: 'bottom-right',
     primaryColor: '#C96F82',
-    name: 'AccessAI Accessibility Layer',
+    name: 'NETRA Accessibility Layer',
     enabledFeatures: {
       textResize: true,
       dyslexiaFont: true,
@@ -961,7 +961,7 @@
     <button
       class="accessai-launcher ${siteConfig.position === 'bottom-left' ? 'position-left' : ''}"
       id="accessai-launcher"
-      aria-label="Open AccessAI Accessibility Controls Menu (Shortcut: Alt+A)"
+      aria-label="Open NETRA Accessibility Controls Menu (Shortcut: Alt+A)"
       aria-haspopup="dialog"
       aria-expanded="false"
     >
@@ -981,19 +981,20 @@
       id="accessai-panel"
       role="dialog"
       aria-modal="true"
-      aria-label="AccessAI Accessibility Settings"
+      aria-label="NETRA Accessibility Settings"
     >
       <!-- Header -->
       <div class="accessai-header">
         <div class="accessai-brand">
           <div class="accessai-logo-icon">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
             </svg>
           </div>
           <div class="accessai-brand-text">
-            <h2>Access<span>AI</span></h2>
-            <p>Accessibility Layer</p>
+            <h2>NETRA</h2>
+            <p>Powered by AccessAI</p>
           </div>
         </div>
         <button class="accessai-close-btn" id="accessai-close" aria-label="Close accessibility menu (Escape)">
@@ -2026,4 +2027,5 @@
     getVoiceState: () => voiceState,
     handleVoiceCommand: (cmd) => handleVoiceCommand(cmd)
   };
+  window.NETRA = window.AccessAI;
 })();
